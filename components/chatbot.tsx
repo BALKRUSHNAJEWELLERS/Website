@@ -124,7 +124,7 @@ export function ChatBot() {
     }
 
     if (lower.includes("scheme") || lower.includes("gold scheme")) {
-      return `We have a wonderful **Gold Scheme** that allows you to invest in gold monthly and redeem it for jewelry. More details on our [Gold Scheme page](/gold-scheme).`;
+      return `We have a wonderful **Gold Schemes for you** that allows you to invest in gold monthly and redeem it for jewelry. More details on our [Gold Scheme page](/gold-scheme).`;
     }
 
     if (lower.includes("store") || lower.includes("location") || lower.includes("address")) {
