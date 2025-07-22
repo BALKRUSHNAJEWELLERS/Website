@@ -1,44 +1,64 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 
+interface MetalRateDoc {
+  _id?: string;
+  gold: number;
+  silver: number;
+  lastUpdated: string;
+}
+
+
+// GET
 export async function GET() {
   try {
-    const { db } = await connectToDatabase()
-    const rates = await db.collection("rates").findOne({}, { sort: { _id: -1 } })
+    const { db } = await connectToDatabase();
+    const ratesCollection = db.collection<MetalRateDoc>('rates');
 
-    if (!rates) {
+    const rates = await ratesCollection.findOne({ _id: "default-rates" });
+
+    if (rates) {
+      return NextResponse.json(rates);
+    } else {
       return NextResponse.json({
         gold: 6250,
         silver: 78,
         lastUpdated: new Date().toISOString(),
-      })
+      });
     }
-
-    return NextResponse.json({
-      gold: rates.gold,
-      silver: rates.silver,
-      lastUpdated: rates.lastUpdated,
-    })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch rates" }, { status: 500 })
+    console.error("Failed to fetch rates:", error);
+    return NextResponse.json({ error: 'Failed to fetch rates' }, { status: 500 });
   }
 }
 
-export async function PUT(request: NextRequest) {
+
+// PUT
+export async function PUT(request: Request) {
   try {
-    const { gold, silver } = await request.json()
-    const { db } = await connectToDatabase()
+    const { db } = await connectToDatabase();
+    const ratesCollection = db.collection<MetalRateDoc>('rates');
 
-    const updatedRates = {
-      gold: Number.parseFloat(gold),
-      silver: Number.parseFloat(silver),
+    const body = await request.json();
+    const { gold, silver } = body;
+
+    const newRates: MetalRateDoc = {
+      _id: "default-rates",
+      gold: parseFloat(gold),
+      silver: parseFloat(silver),
       lastUpdated: new Date().toISOString(),
-    }
+    };
 
-    await db.collection("rates").insertOne(updatedRates)
+    await ratesCollection.updateOne(
+      { _id: "default-rates" },
+      { $set: newRates },
+      { upsert: true }
+    );
 
-    return NextResponse.json(updatedRates)
+    return NextResponse.json({ message: 'Rates updated successfully' });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to update rates" }, { status: 500 })
+    console.error("Failed to update rates:", error);
+    return NextResponse.json({ error: 'Failed to update metal rates' }, { status: 500 });
   }
 }
+

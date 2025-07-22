@@ -1,18 +1,17 @@
 "use client";
-
 import { useState, useEffect } from "react";
+import { Crown, Sparkles, Gem } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  TrendingUp,
-  TrendingDown,
   Star,
   Shield,
   Award,
   Users,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface MetalRate {
   gold: number;
@@ -28,6 +27,118 @@ interface SliderItem {
   link: string;
 }
 
+interface StoryItem {
+  id: string;
+  image: string;
+  title: string;
+  link: string;
+}
+
+// --- MobileStory Component (Moved Outside HomePage) ---
+const staticStoryItems: StoryItem[] = [
+  {
+    id: "daily-wear",
+    image: "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
+    title: "Daily Wear",
+    link: "/catalog/daily-wear",
+  },
+  {
+    id: "latest",
+    image: "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
+    title: "Latest",
+    link: "/catalog/latest",
+  },
+  {
+    id: "new-arrivals",
+    image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTtbo1co3U&usqp=CAc",
+    title: "New Arrivals",
+    link: "/catalog/new-arrivals",
+  },
+  {
+    id: "gold",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
+    title: "Gold",
+    link: "/catalog/gold",
+  },
+  {
+    id: "diamond",
+    image: "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
+    title: "Diamond",
+    link: "/catalog/diamond",
+  },
+  {
+    id: "rings",
+    image: "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
+    title: "Rings",
+    link: "/catalog/rings",
+  },
+];
+
+function MobileStory() {
+  const [dynamicStories, setDynamicStories] = useState<StoryItem[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/products"); // Replace with your actual product API
+        const products = await res.json();
+
+        const storiesFromProducts: StoryItem[] = products
+          .filter((item: any) => item.show_in_story)
+          .map((item: any) => ({
+            id: item.category,
+            image: item.image,
+            title:
+              item.category.charAt(0).toUpperCase() + item.category.slice(1),
+            link: `/catalog/${item.category}`,
+          }));
+
+        setDynamicStories(storiesFromProducts);
+      } catch (error) {
+        console.error("Failed to load dynamic stories", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Combine static and dynamic stories, ensuring no duplicates by ID
+  const finalStories = [
+    ...staticStoryItems.filter(
+      (staticItem) => !dynamicStories.some((dyn) => dyn.id === staticItem.id)
+    ),
+    ...dynamicStories,
+  ];
+
+  return (
+    <section className="md:hidden py-4 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {finalStories.map((story) => (
+            <Link key={story.id} href={story.link} className="flex-shrink-0">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gradient-to-r from-purple-500 to-pink-500 p-0.5">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                    <img
+                      src={story.image || "/placeholder.svg"}
+                      alt={story.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <span className="text-xs font-medium text-gray-700 text-center">
+                  {story.title}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- HomePage Component ---
 export default function HomePage() {
   const [previousRates, setPreviousRates] = useState<MetalRate | null>(null);
   const [rates, setRates] = useState<MetalRate>({
@@ -38,9 +149,36 @@ export default function HomePage() {
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   useEffect(() => {
     setHasMounted(true);
+  }, []);
+
+  // Consolidated and corrected useEffect for fetching rates
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const response = await fetch("/api/rates");
+        if (response.ok) {
+          const data = await response.json();
+          setRates((prevRates) => {
+            setPreviousRates(prevRates);
+            return data;
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch rates:", error);
+      }
+    };
+
+    fetchRates();
+    const interval = setInterval(fetchRates, 300000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -63,108 +201,125 @@ export default function HomePage() {
     fetchSliderItems();
   }, []);
 
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const response = await fetch("/api/rates");
-        if (response.ok) {
-          const data = await response.json();
-          setPreviousRates({
-            gold: rates.gold,
-            silver: rates.silver,
-            lastUpdated: rates.lastUpdated,
-          });
-          setRates(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch rates:", error);
-      }
-    };
-
-    fetchRates();
-    const interval = setInterval(fetchRates, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.max(sliderItems.length, 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [sliderItems.length]);
-
   const features = [
     {
       icon: <Shield className="h-8 w-8" />,
       title: "Certified Quality",
       description:
         "All our jewelry comes with proper certification and quality assurance",
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       icon: <Award className="h-8 w-8" />,
       title: "25+ Years Experience",
       description:
         "Trusted by generations with decades of craftsmanship excellence",
+      gradient: "from-purple-500 to-fuchsia-500",
     },
     {
       icon: <Users className="h-8 w-8" />,
       title: "Customer First",
       description:
         "Dedicated customer service and lifetime maintenance support",
+        gradient: "from-green-500 to-teal-500",
     },
     {
       icon: <Star className="h-8 w-8" />,
       title: "Premium Designs",
       description: "Exclusive designs crafted by master artisans",
+      gradient: "from-pink-500 to-red-500", 
     },
   ];
 
   const defaultSlider = [
     {
-      id: "default",
-      image:
-        "https://media.istockphoto.com/id/1338830019/vector/vector-illustration-golden-ribbon-circle-on-black-background.jpg?s=612x612&w=0&k=20&c=P0utRq7iOkdACPBXxZC_poN-UCLdBZYhqmo8PK1pApY=",
-      title: "Timeless Beauty",
-      subtitle: "Crafted elegance for every occasion",
+      id: "default-1",
+      image: "/placeholder.svg?height=800&width=1200",
+      title: "Discover Our Exquisite Diamond Jewellery",
+      subtitle: "Radiance in Rhythm - Timeless elegance for every occasion",
       link: "/catalog",
+    },
+    {
+      id: "default-2",
+      image: "/placeholder.svg?height=800&width=1200",
+      title: "Timeless Gold Collection",
+      subtitle: "Crafted with precision, designed for perfection",
+      link: "/catalog/gold",
+    },
+    {
+      id: "default-3",
+      image: "/placeholder.svg?height=800&width=1200",
+      title: "Bridal Collection",
+      subtitle: "Make your special day even more memorable",
+      link: "/catalog/wedding",
     },
   ];
 
   const slidesToShow = sliderItems.length > 0 ? sliderItems : defaultSlider;
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slidesToShow.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [slidesToShow.length]);
+
   return (
     <div className="min-h-screen">
       {/* Live Rates Section */}
-      <section className="relative py-20 text-white bg-cover" style={{ backgroundImage: "url('https://png.pngtree.com/thumb_back/fh260/background/20230223/pngtree-large-collection-of-gold-jewellery-image_1689318.jpg')" }}>
-        <div className="absolute inset-0 bg-black/60"></div>
-        <div className="relative container mx-auto px-4">
-          <div className="max-w-md mx-auto bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg space-y-6">
+      <section className="hidden md:block bg-gradient-to-br from-yellow-100 via-amber-200 to-orange-300 dark:from-zinc-800 dark:via-zinc-700 dark:to-yellow-900 text-gray-900 dark:text-white py-20 transition-colors duration-500 mb-12">
+        <div className="container mx-auto px-4">
+          <div className="relative max-w-md mx-auto bg-white/80 dark:bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg space-y-6">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
               <h2 className="text-lg font-semibold uppercase tracking-wide">
                 Live Rates
               </h2>
             </div>
+
+            {/* Gold */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-sm font-medium">Gold (24K)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+                  Gold (24K)
+                </span>
                 <span className="text-xl font-bold">
-                  ₹{rates.gold} <span className="text-sm font-normal">/ gram</span>
+                  ₹{rates.gold}{" "}
+                  <span className="text-sm font-normal">/ gram</span>
                 </span>
               </div>
-              {previousRates && (rates.gold > previousRates.gold ? <TrendingUp className="h-5 w-5 text-green-400" /> : rates.gold < previousRates.gold ? <TrendingDown className="h-5 w-5 text-red-400" /> : null)}
+              {previousRates ? (
+                rates.gold > previousRates.gold ? (
+                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
+                ) : rates.gold < previousRates.gold ? (
+                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
+                ) : null
+              ) : null}
             </div>
+
+            {/* Silver */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-sm font-medium">Silver</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+                  Silver
+                </span>
                 <span className="text-xl font-bold">
-                  ₹{rates.silver} <span className="text-sm font-normal">/ gram</span>
+                  ₹{rates.silver}{" "}
+                  <span className="text-sm font-normal">/ gram</span>
                 </span>
               </div>
-              {previousRates && (rates.silver > previousRates.silver ? <TrendingUp className="h-5 w-5 text-green-400" /> : rates.silver < previousRates.silver ? <TrendingDown className="h-5 w-5 text-red-400" /> : null)}
+              {previousRates ? (
+                rates.silver > previousRates.silver ? (
+                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
+                ) : rates.silver < previousRates.silver ? (
+                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
+                ) : null
+              ) : null}
             </div>
+
             {hasMounted && (
-              <div className="absolute bottom-3 right-4 text-xs text-gray-300">
+              <div className="absolute bottom-3 right-4 text-xs text-gray-500 dark:text-gray-400">
                 Last updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
               </div>
             )}
@@ -172,152 +327,255 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Hero Slider */}
-      <section className="relative h-[70vh] overflow-hidden m-20 bg-gray-50 dark:bg-gray-900">
-        {slidesToShow.map((item, index) => (
-          <div
-            key={item.id}
-            className={`absolute inset-0 transition-transform duration-1000 ease-in-out ${
-              index === currentSlide
-                ? "translate-x-0"
-                : index < currentSlide
-                ? "-translate-x-full"
-                : "translate-x-full"
-            }`}
-          >
-            <div className="relative w-full h-[500px] overflow-hidden">
-              <img
-                src={item.image || "/placeholder.svg"}
-                alt={item.title}
-                className="absolute top-0 left-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/40" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-white max-w-4xl px-4">
-                  <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
-                    {item.title}
-                  </h1>
-                  <p className="text-xl md:text-2xl mb-8 opacity-90">
-                    {item.subtitle}
-                  </p>
-                  <Link href={item.link}>
-                    <Button
-                      size="lg"
-                      className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg"
-                    >
-                      Explore Collection
-                    </Button>
-                  </Link>
-                </div>
+      {/* Live Rates Section - Mobile Only */}
+      <section className="block md:hidden relative py-8 text-white bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900">
+        <div className="container mx-auto px-4">
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-lg space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+              <h2 className="text-sm font-semibold uppercase tracking-wide">
+                Live Rates
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <span className="text-xs font-medium">Gold (24K)</span>
+                <span className="text-lg font-bold">
+                  ₹{rates.gold}{" "}
+                  <span className="text-xs font-normal">/ gram</span>
+                </span>
               </div>
+              {previousRates ? (
+                rates.gold > previousRates.gold ? (
+                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
+                ) : rates.gold < previousRates.gold ? (
+                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
+                ) : null
+              ) : null}
+              <div className="flex flex-col">
+                <span className="text-xs font-medium">Silver</span>
+                <span className="text-lg font-bold">
+                  ₹{rates.silver}{" "}
+                  <span className="text-xs font-normal">/ gram</span>
+                </span>
+              </div>
+              {previousRates ? (
+                rates.silver > previousRates.silver ? (
+                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
+                ) : rates.silver < previousRates.silver ? (
+                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
+                ) : null
+              ) : null}
             </div>
           </div>
-        ))}
-
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-          {slidesToShow.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide ? "bg-white" : "bg-white/50"
-              }`}
-            />
-          ))}
         </div>
       </section>
 
-         {/* Quick Actions */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card 
-              className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 shadow border-l-4 border-l-orange-500 bg-white dark:bg-gray-800 overflow-hidden relative">
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-4 text-orange-600">
-                  Gold Scheme
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Join our flexible gold savings scheme and secure your future
-                  with gold investments
-                </p>
-                <Link href="/gold-scheme">
-                  <Button className="bg-orange-500 hover:bg-orange-600">
-                    Learn More
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+      {/* Mobile Story Navigation */}
+      <MobileStory />
 
-            <Card
-             className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 shadow border-l-4 border-l-red-500 bg-white dark:bg-gray-800 overflow-hidden relative">
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-4 text-red-600">
-                  Digital Gold
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Buy, sell, and store gold digitally with complete security and
-                  transparency
-                </p>
-                <Link href="/digital-gold">
-                  <Button className="bg-red-500 hover:bg-red-600">
-                    Get Started
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+      {/* Hero Slider Section */}
+      <section className="relative">
+        {/* Desktop Hero Slider */}
+        <div className="hidden md:block relative h-[70vh] lg:h-[80vh] overflow-hidden bg-center bg-cover">
+          {slidesToShow.map((item, index) => (
+            <Link
+              href={item.link || "#"}
+              key={item.id}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out cursor-pointer ${
+                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
+              style={{
+                transform: `translateX(${100 * (index - currentSlide)}%)`,
+              }}
+            >
+              <div className="relative w-full h-full">
+                <img
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10" />
 
-            <Card 
-            className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 shadow border-l-4 border-l-yellow-500 bg-white dark:bg-gray-800 overflow-hidden relative">
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-4 text-yellow-600">
-                  Ring Measurement
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Find your perfect ring size with our accurate measurement
-                  tools
-                </p>
-                <Link href="/ring-measurement">
-                  <Button className="bg-yellow-500 hover:bg-yellow-600">
-                    Measure Now
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                {/* Content */}
+                <div className="absolute z-20 left-8 lg:left-16 top-1/2 transform -translate-y-1/2 text-white max-w-2xl">
+                  <h1 className="text-4xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6 drop-shadow-lg">
+                    {item.title}
+                  </h1>
+                  <p className="text-lg lg:text-xl xl:text-2xl mb-8 opacity-90 drop-shadow-md">
+                    {item.subtitle}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
+
+          {/* Desktop Navigation Dots */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30 bg-cover ">
+            {slidesToShow.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentSlide(index);
+                }}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === currentSlide
+                    ? "bg-white scale-125"
+                    : "bg-white/50 hover:bg-white/80"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Hero Slider */}
+        <div className="md:hidden relative h-[50vh] overflow-hidden">
+          {slidesToShow.map((item, index) => (
+            <Link
+              href={item.link || "#"}
+              key={item.id}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out cursor-pointer ${
+                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
+              style={{
+                transform: `translateX(${100 * (index - currentSlide)}%)`,
+              }}
+            >
+              <div className="relative w-full h-full">
+                <img
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+
+                {/* Mobile Content */}
+                <div className="absolute z-20 bottom-8 left-4 right-4 text-white">
+                  <h1 className="text-2xl font-bold leading-tight mb-2">
+                    {item.title}
+                  </h1>
+                  <p className="text-sm mb-4 opacity-90">{item.subtitle}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+
+          {/* Mobile Navigation Dots */}
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
+            {slidesToShow.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentSlide(index);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentSlide ? "bg-white" : "bg-white/50"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-
-      {/* Features Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Why Choose BALKRUSHNA JEWELLERS
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+              Our Services
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Experience the finest in jewelry craftsmanship with our commitment
-              to quality and excellence
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
+              Discover our comprehensive range of jewelry services designed for
+              you
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            {[
+              {
+                title: "Gold Scheme",
+                description:
+                  "Join our flexible gold savings scheme and secure your future with gold investments",
+                color: "orange",
+                link: "/gold-scheme",
+                icon: <Crown className="h-6 w-6 sm:h-8 sm:w-8" />,
+              },
+              {
+                title: "Digital Gold",
+                description:
+                  "Buy, sell, and store gold digitally with complete security and transparency",
+                color: "red",
+                link: "/digital-gold",
+                icon: <Sparkles className="h-6 w-6 sm:h-8 sm:w-8" />,
+              },
+              {
+                title: "Ring Measurement",
+                description:
+                  "Find your perfect ring size with our accurate measurement tools",
+                color: "yellow",
+                link: "/ring-measurement",
+                icon: <Gem className="h-6 w-6 sm:h-8 sm:w-8" />,
+              },
+            ].map((service, index) => (
               <Card
                 key={index}
-                className="text-center hover:shadow-lg transition-shadow"
+                className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
               >
-                <CardContent className="p-6">
-                  <div className="text-orange-500 mb-4 flex justify-center">
-                    {feature.icon}
+                <div
+                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
+                    service.color === "orange"
+                      ? "from-orange-400 to-orange-600"
+                      : service.color === "red"
+                      ? "from-red-400 to-red-600"
+                      : "from-yellow-400 to-yellow-600"
+                  }`}
+                ></div>
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <div
+                    className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${
+                      service.color === "orange"
+                        ? "from-orange-400 to-orange-600"
+                        : service.color === "red"
+                        ? "from-red-400 to-red-600"
+                        : "from-yellow-400 to-yellow-600"
+                    } shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    {service.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    {feature.title}
+                  <h3
+                    className={`text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 ${
+                      service.color === "orange"
+                        ? "text-orange-600"
+                        : service.color === "red"
+                        ? "text-red-600"
+                        : "text-yellow-600"
+                    }`}
+                  >
+                    {service.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {feature.description}
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed">
+                    {service.description}
                   </p>
+                  <Link href={service.link}>
+                    <Button
+                      className={`w-full sm:w-auto ${
+                        service.color === "orange"
+                          ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                          : service.color === "red"
+                          ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                          : "bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700"
+                      } text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
+                    >
+                      {service.color === "orange"
+                        ? "Learn More"
+                        : service.color === "red"
+                        ? "Get Started"
+                        : "Measure Now"}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -325,15 +583,82 @@ export default function HomePage() {
         </div>
       </section>
 
-     
+      {/* Features Section */}
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div
+            className={`text-center mb-8 sm:mb-12 md:mb-16 transition-all duration-1000 ${
+              isVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
+            }`}
+          >
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <Crown className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-yellow-500" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-6">
+              Why Choose{" "}
+              <span className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">
+                BALKRUSHNA JEWELLERS
+              </span>
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
+              Experience the finest in jewelry craftsmanship with our commitment
+              to quality and excellence
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className={`group transition-all duration-700 ${
+                  isVisible
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-8 opacity-0"
+                }`}
+                style={{ transitionDelay: `${index * 200}ms` }}
+              >
+                <Card className="text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 overflow-hidden relative h-full">
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                  ></div>
+                  <CardContent className="p-4 sm:p-6 md:p-8 relative">
+                    <div
+                      className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 group-hover:bg-clip-text transition-all duration-300">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Newsletter */}
-      <section className="py-16 bg-cover bg-center text-white" style={{ backgroundImage: "url('https://png.pngtree.com/thumb_back/fh260/background/20240929/pngtree-beautiful-diamond-engagement-ring-on-a-dark-sparkling-background-the-focus-image_16280948.jpg')"}}>
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-xl mb-8 opacity-90">
+      <section
+        className="py-12 md:py-16 bg-cover bg-center text-white relative"
+        style={{
+          backgroundImage:
+            "url('https://png.pngtree.com/thumb_back/fh260/background/20240929/pngtree-beautiful-diamond-engagement-ring-on-a-dark-sparkling-background-the-focus-image_16280948.jpg')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60 "></div>
+        <div className="relative container mx-auto px-4 text-center ">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Stay Updated</h2>
+          <p className="text-lg md:text-xl mb-6 md:mb-8 opacity-90">
             Get the latest updates on new collections and exclusive offers
           </p>
-          <div className="max-w-md mx-auto flex gap-4">
+          <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-4">
             <input
               type="email"
               placeholder="Enter your email"

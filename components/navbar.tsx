@@ -57,7 +57,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ">
             <Button
               variant="ghost"
               size="icon"
@@ -76,7 +76,7 @@ export function Navbar() {
             </Button>
 
             <Link href="tel:+917600093017">
-              <Button className="hidden md:flex bg-orange-500 hover:bg-orange-600 text-white">
+              <Button className="hidden md:flex bg-gradient-to-r from-red-500 to-red-600 text-white">
                 <Phone className="h-4 w-4 mr-2" />
                 Call Now
               </Button>
