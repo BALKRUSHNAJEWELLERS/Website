@@ -38,37 +38,43 @@ interface StoryItem {
 const staticStoryItems: StoryItem[] = [
   {
     id: "daily-wear",
-    image: "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
+    image:
+      "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
     title: "Daily Wear",
     link: "/catalog/daily-wear",
   },
   {
     id: "latest",
-    image: "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
+    image:
+      "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
     title: "Latest",
     link: "/catalog/latest",
   },
   {
     id: "new-arrivals",
-    image: "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTtbo1co3U&usqp=CAc",
+    image:
+      "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTbbo1co3U&usqp=CAc",
     title: "New Arrivals",
     link: "/catalog/new-arrivals",
   },
   {
     id: "gold",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
     title: "Gold",
     link: "/catalog/gold",
   },
   {
     id: "diamond",
-    image: "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
+    image:
+      "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
     title: "Diamond",
     link: "/catalog/diamond",
   },
   {
     id: "rings",
-    image: "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
+    image:
+      "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
     title: "Rings",
     link: "/catalog/rings",
   },
@@ -221,13 +227,13 @@ export default function HomePage() {
       title: "Customer First",
       description:
         "Dedicated customer service and lifetime maintenance support",
-        gradient: "from-green-500 to-teal-500",
+      gradient: "from-green-500 to-teal-500",
     },
     {
       icon: <Star className="h-8 w-8" />,
       title: "Premium Designs",
       description: "Exclusive designs crafted by master artisans",
-      gradient: "from-pink-500 to-red-500", 
+      gradient: "from-pink-500 to-red-500",
     },
   ];
 
@@ -447,22 +453,26 @@ export default function HomePage() {
                 <img
                   src={item.image || "/placeholder.svg"}
                   alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  // Adjusted object-cover and added object-position to ensure image fills well
+                  className="absolute inset-0 w-full h-full object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+                {/* Adjusted gradient for better text visibility on mobile */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
 
-                {/* Mobile Content */}
-                <div className="absolute z-20 bottom-8 left-4 right-4 text-white">
-                  <h1 className="text-2xl font-bold leading-tight mb-2">
+                {/* Mobile Content - Adjusted positioning and text sizes */}
+                <div className="absolute z-20 bottom-6 left-4 right-4 text-white text-center">
+                  <h1 className="text-xl xs:text-2xl font-bold leading-tight mb-2">
                     {item.title}
                   </h1>
-                  <p className="text-sm mb-4 opacity-90">{item.subtitle}</p>
+                  <p className="text-xs xs:text-sm mb-4 opacity-90">
+                    {item.subtitle}
+                  </p>
                 </div>
               </div>
             </Link>
           ))}
 
-          {/* Mobile Navigation Dots */}
+          {/* Mobile Navigation Dots - Adjusted size for better touch */}
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
             {slidesToShow.map((_, index) => (
               <button
@@ -471,7 +481,7 @@ export default function HomePage() {
                   e.stopPropagation();
                   setCurrentSlide(index);
                 }}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   index === currentSlide ? "bg-white" : "bg-white/50"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -481,6 +491,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Our Services Section */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
@@ -493,7 +504,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          {/* Adjusted grid for better mobile stacking and spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-8">
             {[
               {
                 title: "Gold Scheme",
@@ -501,7 +513,7 @@ export default function HomePage() {
                   "Join our flexible gold savings scheme and secure your future with gold investments",
                 color: "orange",
                 link: "/gold-scheme",
-                icon: <Crown className="h-6 w-6 sm:h-8 sm:w-8" />,
+                icon: <Crown className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />,
               },
               {
                 title: "Digital Gold",
@@ -509,7 +521,9 @@ export default function HomePage() {
                   "Buy, sell, and store gold digitally with complete security and transparency",
                 color: "red",
                 link: "/digital-gold",
-                icon: <Sparkles className="h-6 w-6 sm:h-8 sm:w-8" />,
+                icon: (
+                  <Sparkles className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />
+                ),
               },
               {
                 title: "Ring Measurement",
@@ -517,12 +531,12 @@ export default function HomePage() {
                   "Find your perfect ring size with our accurate measurement tools",
                 color: "yellow",
                 link: "/ring-measurement",
-                icon: <Gem className="h-6 w-6 sm:h-8 sm:w-8" />,
+                icon: <Gem className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />,
               },
             ].map((service, index) => (
               <Card
                 key={index}
-                className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
+                className="w-full h-72 sm:h-full sm:w-auto flex flex-col justify-center items-center text-center group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
               >
                 <div
                   className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
@@ -533,7 +547,8 @@ export default function HomePage() {
                       : "from-yellow-400 to-yellow-600"
                   }`}
                 ></div>
-                <CardContent className="p-4 sm:p-6 md:p-8">
+                {/* Adjusted padding for card content on smaller screens */}
+                <CardContent className="p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
                   <div
                     className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${
                       service.color === "orange"
@@ -545,8 +560,9 @@ export default function HomePage() {
                   >
                     {service.icon}
                   </div>
+                  {/* Adjusted text sizes for better mobile readability */}
                   <h3
-                    className={`text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 ${
+                    className={`text-base sm:text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center ${
                       service.color === "orange"
                         ? "text-orange-600"
                         : service.color === "red"
@@ -556,12 +572,13 @@ export default function HomePage() {
                   >
                     {service.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center">
                     {service.description}
                   </p>
                   <Link href={service.link}>
+                    {/* Adjusted button width for better mobile fit */}
                     <Button
-                      className={`w-full sm:w-auto ${
+                      className={`w-full ${
                         service.color === "orange"
                           ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
                           : service.color === "red"
@@ -585,7 +602,7 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-teal-100 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div
             className={`text-center mb-8 sm:mb-12 md:mb-16 transition-all duration-1000 ${
@@ -609,7 +626,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          {/* Adjusted grid for better mobile stacking and spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -620,20 +638,25 @@ export default function HomePage() {
                 }`}
                 style={{ transitionDelay: `${index * 200}ms` }}
               >
-                <Card className="text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 overflow-hidden relative h-full">
+                <Card
+                  key={index}
+                  className="w-full h-72 sm:h-full sm:w-auto flex flex-col justify-center items-center text-center group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
+                >
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                   ></div>
-                  <CardContent className="p-4 sm:p-6 md:p-8 relative">
+                  {/* Adjusted padding for card content on smaller screens */}
+                  <CardContent className="p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
                     <div
                       className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}
                     >
                       {feature.icon}
                     </div>
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 group-hover:bg-clip-text transition-all duration-300">
+                    {/* Adjusted text sizes for better mobile readability */}
+                    <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">
                       {feature.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center">
                       {feature.description}
                     </p>
                   </CardContent>
