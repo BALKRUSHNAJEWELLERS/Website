@@ -1,6 +1,7 @@
+// Navbar.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,26 +23,28 @@ export function Navbar() {
     { name: "Contact", href: "/contact" },
   ];
 
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
+  }, [isOpen]);
+
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b">
+    <nav className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">BJ</span>
+            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">BKJ</span>
             </div>
             <div className="hidden md:block">
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-xl font-bold text-red-700 dark:text-white">
                 BALKRUSHNA
               </span>
-              <div className="text-sm text-orange-600 font-medium">
+              <div className="text-sm text-red-700 font-medium">
                 JEWELLERS
               </div>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
@@ -54,8 +57,7 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ">
             <Button
               variant="ghost"
               size="icon"
@@ -74,7 +76,7 @@ export function Navbar() {
             </Button>
 
             <Link href="tel:+917600093017">
-              <Button className="hidden md:flex bg-orange-500 hover:bg-orange-600 text-white">
+              <Button className="hidden md:flex bg-gradient-to-r from-red-500 to-red-600 text-white">
                 <Phone className="h-4 w-4 mr-2" />
                 Call Now
               </Button>
@@ -82,7 +84,6 @@ export function Navbar() {
 
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              {/* Menu Button for Mobile */}
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -94,12 +95,10 @@ export function Navbar() {
                 </Button>
               </SheetTrigger>
 
-              {/* Transparent Sidebar */}
               <SheetContent
                 side="right"
-                className="w-full max-w-xs p-6 bg-white/10 backdrop-blur-lg border-none shadow-xl"
+                className="w-full max-w-xs p-6 bg-white/10 dark:bg-black/10 backdrop-blur-xl border-none shadow-2xl"
               >
-                {/* Logo */}
                 <div className="flex items-center justify-between mb-6">
                   <Link
                     href="/"
@@ -120,23 +119,20 @@ export function Navbar() {
                   </Link>
                 </div>
 
-                {/* Navigation Links */}
                 <div className="flex flex-col gap-3">
-                  {navItems.map((item, index) => (
+                  {navItems.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/20 transition text-white"
                     >
-                      {/* Use better icons here if needed */}
                       <Menu className="w-4 h-4 text-orange-400" />
                       <span className="text-base font-medium">{item.name}</span>
                     </Link>
                   ))}
                 </div>
 
-                {/* Bottom CTA */}
                 <div className="absolute bottom-6 left-0 w-full px-6">
                   <Link
                     href="tel:+917600093017"
