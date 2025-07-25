@@ -513,7 +513,7 @@ export default function DigitalGoldPage() {
             className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-lg font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 px-8 py-2 bg-white text-orange-600 hover:bg-gray-100 shadow-lg transform hover:scale-105"
           >
             <Phone className="h-5 w-5 mr-2" />
-            Call Now to Invest
+            Call Now for Invest
           </a>
         </div>
       </section>
