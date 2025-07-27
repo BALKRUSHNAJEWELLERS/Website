@@ -31,81 +31,43 @@ interface StoryItem {
   id: string;
   image: string;
   title: string;
+  subtitle: string;
   link: string;
 }
 
-// --- MobileStory Component (Moved Outside HomePage) ---
-const staticStoryItems: StoryItem[] = [
-  {
-    id: "daily-wear",
-    image:
-      "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
-    title: "Daily Wear",
-    link: "/catalog/daily-wear",
-  },
-  {
-    id: "latest",
-    image:
-      "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
-    title: "Latest",
-    link: "/catalog/latest",
-  },
-  {
-    id: "new-arrivals",
-    image:
-      "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTbbo1co3U&usqp=CAc",
-    title: "New Arrivals",
-    link: "/catalog/new-arrivals",
-  },
-  {
-    id: "gold",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
-    title: "Gold",
-    link: "/catalog/gold",
-  },
-  {
-    id: "diamond",
-    image:
-      "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
-    title: "Diamond",
-    link: "/catalog/diamond",
-  },
-  {
-    id: "rings",
-    image:
-      "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
-    title: "Rings",
-    link: "/catalog/rings",
-  },
-];
+// --- MobileStory Component (Updated for Dynamic Data) ---
+const staticStoryItems: StoryItem[] = [];
 
 function MobileStory() {
   const [dynamicStories, setDynamicStories] = useState<StoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [clickedStory, setClickedStory] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDynamicStories = async () => {
       try {
-        const res = await fetch("/api/products"); // Replace with your actual product API
-        const products = await res.json();
+        setLoading(true);
+        // Use the dedicated stories API endpoint
+        const res = await fetch("/api/stories");
 
-        const storiesFromProducts: StoryItem[] = products
-          .filter((item: any) => item.show_in_story)
-          .map((item: any) => ({
-            id: item.category,
-            image: item.image,
-            title:
-              item.category.charAt(0).toUpperCase() + item.category.slice(1),
-            link: `/catalog/${item.category}`,
-          }));
+        if (!res.ok) {
+          throw new Error("Failed to fetch stories");
+        }
 
-        setDynamicStories(storiesFromProducts);
+        const storiesFromAPI = await res.json();
+        console.log("data", storiesFromAPI);
+
+        setDynamicStories(storiesFromAPI);
       } catch (error) {
         console.error("Failed to load dynamic stories", error);
+        // Fallback to static stories if API fails
+        setDynamicStories([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
+    fetchDynamicStories();
   }, []);
 
   // Combine static and dynamic stories, ensuring no duplicates by ID
@@ -116,27 +78,133 @@ function MobileStory() {
     ...dynamicStories,
   ];
 
+  const handleStoryClick = (storyId: string, link: string) => {
+    setClickedStory(storyId);
+
+    // Add a small delay for animation before navigation
+    setTimeout(() => {
+      //in link first letter need capital
+
+      window.location.href = link;
+    }, 200);
+  };
+
+  if (loading) {
+    return (
+      <section className="md:hidden py-6 bg-gradient-to-r from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+            {/* Loading skeleton */}
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="flex-shrink-0">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-400 to-pink-400 p-1 animate-pulse">
+                      <div className="w-full h-full rounded-full bg-gray-200"></div>
+                    </div>
+                  </div>
+                  <div className="w-20 h-4 bg-gray-200 animate-pulse rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="md:hidden py-4 bg-white">
+    <section className="md:hidden py-6 bg-gradient-to-r from-gray-50 to-white">
       <div className="container mx-auto px-4">
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          {finalStories.map((story) => (
-            <Link key={story.id} href={story.link} className="flex-shrink-0">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gradient-to-r from-purple-500 to-pink-500 p-0.5">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-white">
-                    <img
-                      src={story.image || "/placeholder.svg"}
-                      alt={story.title}
-                      className="w-full h-full object-cover"
-                    />
+        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+          {finalStories.map((story, index) => (
+            <div
+              key={story.id}
+              className="flex-shrink-0 cursor-pointer"
+              onClick={() => handleStoryClick(story.id, story.link)}
+            >
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative group">
+                  {/* Rotating Dotted Border Ring */}
+                  <div className="relative w-24 h-24">
+                    {/* Static gradient background - only show when NOT clicked */}
+                    {clickedStory !== story.id && (
+                      <div
+                        className="absolute inset-0 rounded-full p-1 transition-opacity duration-300"
+                        style={{
+                          background: `linear-gradient(45deg, 
+          hsl(${(index * 60) % 360}, 70%, 60%), 
+          hsl(${(index * 60 + 60) % 360}, 70%, 60%)
+        )`,
+                        }}
+                      >
+                        {/* Inner White Ring */}
+                        <div className="w-full h-full rounded-full bg-white p-0.5">
+                          {/* Image Container */}
+                          <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 relative">
+                            <img
+                              src={story.image || "/placeholder.svg"}
+                              alt={story.title}
+                              className="w-full h-full p-4 object-cover transition-all duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src =
+                                  "/placeholder.svg?height=80&width=80&text=" +
+                                  encodeURIComponent(story.title);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* When clicked - show only image with white background and rotating dotted border */}
+                    {clickedStory === story.id && (
+                      <>
+                        {/* White background with image */}
+                        <div className="absolute inset-0 rounded-full bg-white p-0.5">
+                          <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 relative">
+                            <img
+                              src={story.image || "/placeholder.svg"}
+                              alt={story.title}
+                              className="w-full h-full p-4 object-cover scale-95 brightness-90"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src =
+                                  "/placeholder.svg?height=80&width=80&text=" +
+                                  encodeURIComponent(story.title);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Clean Rotating Dotted Border */}
+                        <div
+                          className="absolute inset-0 rounded-full animate-spin"
+                          style={{
+                            border: `3px dotted hsl(${
+                              (index * 60) % 360
+                            }, 80%, 60%)`,
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
-                <span className="text-xs font-medium text-gray-700 text-center">
+
+                {/* Story Title */}
+                <span
+                  className={`text-xs font-medium text-center max-w-[90px] leading-tight transition-all duration-200 ${
+                    clickedStory === story.id
+                      ? "text-purple-600 scale-95 font-semibold"
+                      : "text-gray-700 group-hover:text-purple-600"
+                  }`}
+                >
                   {story.title}
                 </span>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
@@ -267,7 +335,6 @@ export default function HomePage() {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slidesToShow.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [slidesToShow.length]);
 
@@ -283,7 +350,6 @@ export default function HomePage() {
                 Live Rates
               </h2>
             </div>
-
             {/* Gold */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
@@ -303,7 +369,6 @@ export default function HomePage() {
                 ) : null
               ) : null}
             </div>
-
             {/* Silver */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
@@ -323,7 +388,6 @@ export default function HomePage() {
                 ) : null
               ) : null}
             </div>
-
             {hasMounted && (
               <div className="absolute bottom-3 right-4 text-xs text-gray-500 dark:text-gray-400">
                 Last updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
@@ -402,7 +466,6 @@ export default function HomePage() {
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10" />
-
                 {/* Content */}
                 <div className="absolute z-20 left-8 lg:left-16 top-1/2 transform -translate-y-1/2 text-white max-w-2xl">
                   <h1 className="text-4xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6 drop-shadow-lg">
@@ -415,7 +478,6 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
-
           {/* Desktop Navigation Dots */}
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30 bg-cover ">
             {slidesToShow.map((_, index) => (
@@ -435,7 +497,6 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-
         {/* Mobile Hero Slider */}
         <div className="md:hidden relative h-[50vh] overflow-hidden">
           {slidesToShow.map((item, index) => (
@@ -458,7 +519,6 @@ export default function HomePage() {
                 />
                 {/* Adjusted gradient for better text visibility on mobile */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
-
                 {/* Mobile Content - Adjusted positioning and text sizes */}
                 <div className="absolute z-20 bottom-6 left-4 right-4 text-white text-center">
                   <h1 className="text-xl xs:text-2xl font-bold leading-tight mb-2">
@@ -471,7 +531,6 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
-
           {/* Mobile Navigation Dots - Adjusted size for better touch */}
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
             {slidesToShow.map((_, index) => (
@@ -503,7 +562,6 @@ export default function HomePage() {
               you
             </p>
           </div>
-
           {/* Adjusted grid for better mobile stacking and spacing */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-8">
             {[
@@ -625,7 +683,6 @@ export default function HomePage() {
               to quality and excellence
             </p>
           </div>
-
           {/* Adjusted grid for better mobile stacking and spacing */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-8">
             {features.map((feature, index) => (

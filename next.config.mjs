@@ -7,8 +7,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['5.imimg.com'], // ✅ Allow external image hosting domain
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**", // allow all domains
+      },
+    ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

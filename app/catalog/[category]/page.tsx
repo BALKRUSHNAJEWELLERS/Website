@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Search, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface Product {
   id: string;
@@ -19,31 +21,36 @@ interface Product {
   description: string;
 }
 
-const categories = [
-  { value: "all", label: "All Categories", path: "/catalog" },
-  { value: "Rings", label: "Rings", path: "/catalog/Ring" },
-  { value: "Necklaces", label: "Necklaces", path: "/catalog/Necklace" },
-  { value: "Earrings", label: "Earrings", path: "/catalog/Earring" },
-  { value: "Bracelets", label: "Bracelets", path: "/catalog/Bracelet" },
-  { value: "Pendants", label: "Pendants", path: "/catalog/Pendant" },
-];
+const categoryTitles: Record<string, string> = {
+  rings: "Rings Collection",
+  necklaces: "Necklaces Collection",
+  earrings: "Earrings Collection",
+  bracelets: "Bracelets Collection",
+  pendants: "Pendants Collection",
+};
 
-export default function CatalogPage() {
+export default function CategoryPage() {
+  const params = useParams();
+  const category = params.category as string;
+
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedMetal, setSelectedMetal] = useState("all");
   const [sortBy, setSortBy] = useState("name");
 
-  // Filter and search logic
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch("/api/admin/products");
         const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data);
+
+        // Filter products by category
+        const categoryProducts = data.filter(
+          (product: Product) => product.category === category
+        );
+        setProducts(categoryProducts);
+        setFilteredProducts(categoryProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
         // Fallback to empty array on error
@@ -53,8 +60,9 @@ export default function CatalogPage() {
     };
 
     fetchProducts();
-  }, []);
+  }, [category]);
 
+  // Filter and search logic
   useEffect(() => {
     let filtered = products;
 
@@ -63,15 +71,7 @@ export default function CatalogPage() {
       filtered = filtered.filter(
         (product) =>
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Category filter
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(
-        (product) => product.category === selectedCategory
       );
     }
 
@@ -96,37 +96,31 @@ export default function CatalogPage() {
     });
 
     setFilteredProducts(filtered);
-  }, [products, searchTerm, selectedCategory, selectedMetal, sortBy]);
+  }, [products, searchTerm, selectedMetal, sortBy]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Our Jewelry Collection
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Discover our exquisite collection of handcrafted jewelry, each piece
-            telling its own unique story
-          </p>
-        </div>
+        <div className="mb-6">
+          <Link href="/catalog">
+            <Button
+              variant="outline"
+              className="mb-4 rounded-full bg-transparent text-sm"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Catalog
+            </Button>
+          </Link>
 
-        {/* Category Navigation */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
-          {categories.map((category) => (
-            <Link key={category.value} href={category.path}>
-              <Button
-                variant={
-                  selectedCategory === category.value ? "default" : "outline"
-                }
-                className="rounded-full px-4 py-2 text-sm transition-all hover:scale-105"
-                onClick={() => setSelectedCategory(category.value)}
-              >
-                {category.label}
-              </Button>
-            </Link>
-          ))}
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+              {categoryTitles[category] || "Collection"}
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              {filteredProducts.length} {category} in this collection
+            </p>
+          </div>
         </div>
 
         {/* Products Grid */}
@@ -146,17 +140,13 @@ export default function CatalogPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <Link href={`/catalog/${product.category}`}>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                </Link>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
               </div>
 
               <CardContent className="p-3">
-                <Link href={`/catalog/${product.category}`}>
-                  <h3 className="font-medium text-sm text-gray-900 dark:text-white text-center line-clamp-2 group-hover:text-amber-600 transition-colors">
-                    {product.name}
-                  </h3>
-                </Link>
+                <h3 className="font-medium text-sm text-gray-900 dark:text-white text-center line-clamp-2 group-hover:text-amber-600 transition-colors">
+                  {product.name}
+                </h3>
               </CardContent>
             </Card>
           ))}
@@ -167,24 +157,22 @@ export default function CatalogPage() {
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                {/* Removed Search Icon */}
+                <Search className="h-12 w-12 text-gray-400" />
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                No jewelry found
+                No {category} found
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                We couldn't find any pieces matching your search criteria. Try
-                adjusting your filters.
+                We couldn't find any {category} matching your search criteria.
               </p>
               <Button
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedCategory("all");
                   setSelectedMetal("all");
                 }}
                 className="rounded-full"
               >
-                Clear All Filters
+                Clear Filters
               </Button>
             </div>
           </div>
