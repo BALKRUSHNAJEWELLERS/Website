@@ -140,8 +140,9 @@ export default function BalkrushnaRingMeasurementPage() {
     <div className="container mx-auto px-4 py-8 font-sans bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 min-h-screen">
       <div className="text-center mb-12">
         {/* Balkrushna Branding */}
-        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700 dark:from-orange-300 dark:to-orange-500 mb-2 drop-shadow-lg">BALKRUSHNA</h1>
-        <h2 className="text-3xl md:text-4xl font-semibold text-orange-600 dark:text-orange-400 mb-4">Ring Size Guide</h2>
+        {/* Adjusted font sizes for smaller screens */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700 dark:from-orange-300 dark:to-orange-500 mb-2 drop-shadow-lg">BALKRUSHNA</h1>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-orange-600 dark:text-orange-400 mb-4">Ring Size Guide</h2>
         <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
           Find your perfect ring size with Balkrushna's comprehensive guide.
         </p>
@@ -153,21 +154,21 @@ export default function BalkrushnaRingMeasurementPage() {
             <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-1 shadow-md">
               <TabsTrigger
                 value="finger"
-                className="flex items-center justify-center gap-2 py-2 px-4 rounded-md text-base md:text-lg font-medium
-                           data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
-                           dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
-                           transition-all duration-300 ease-in-out hover:scale-105"
+                className="flex items-center justify-center gap-2 py-2 px-2 sm:px-4 rounded-md text-sm md:text-lg font-medium
+                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
+                                dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
+                                transition-all duration-300 ease-in-out hover:scale-105"
               >
-                <Hand className="h-5 w-5 md:h-6 md:w-6" /> Method 2: The Hands-On Approach
+                <Hand className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" /> <span className="hidden sm:inline">Method 2:</span> Measure Finger
               </TabsTrigger>
               <TabsTrigger
                 value="ring"
-                className="flex items-center justify-center gap-2 py-2 px-4 rounded-md text-base md:text-lg font-medium
-                           data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
-                           dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
-                           transition-all duration-300 ease-in-out hover:scale-105"
+                className="flex items-center justify-center gap-2 py-2 px-2 sm:px-4 rounded-md text-sm md:text-lg font-medium
+                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
+                                dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
+                                transition-all duration-300 ease-in-out hover:scale-105"
               >
-                <Scan className="h-5 w-5 md:h-6 md:w-6" /> Method 1: Using an Existing Ring
+                <Scan className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" /> <span className="hidden sm:inline">Method 1:</span> Measure Ring
               </TabsTrigger>
             </TabsList>
 
@@ -190,7 +191,7 @@ export default function BalkrushnaRingMeasurementPage() {
                     <div
                       ref={fingerRef}
                       style={{ width: `${fingerWidthPx}px`, height: `${fingerHeightPx}px`, border: '2px solid #f97316', borderRadius: '8px' }}
-                      className="mx-auto bg-gray-200 dark:bg-gray-900 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm overflow-hidden transition-all duration-100 ease-linear"
+                      className="mx-auto bg-gray-200 dark:bg-gray-900 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs overflow-hidden transition-all duration-100 ease-linear" // Reduced text size for finger measurement
                     >
                       <span className="px-2">{`W: ${(fingerWidthPx * 25.4 / dpi).toFixed(2)} mm, H: ${(fingerHeightPx * 25.4 / dpi).toFixed(2)} mm`}</span>
                     </div>
@@ -277,7 +278,7 @@ export default function BalkrushnaRingMeasurementPage() {
                         padding: '4px', // This creates the "thickness"
                         boxShadow: '0px 4px 10px rgba(0,0,0,0.2), inset 0 0 0 2px rgba(255,255,255,0.5)', // Subtle shadow and inner highlight
                       }}
-                      className="mx-auto text-gray-800 dark:text-gray-100 text-sm overflow-hidden transition-all duration-100 ease-linear"
+                      className="mx-auto text-gray-800 dark:text-gray-100 text-xs overflow-hidden transition-all duration-100 ease-linear" // Reduced text size for ring measurement
                     >
                       {/* Inner transparent part of the ring */}
                       <div
@@ -436,10 +437,10 @@ export default function BalkrushnaRingMeasurementPage() {
                 <div className="font-bold text-orange-700 dark:text-orange-400 py-1 border-b border-gray-300 dark:border-gray-600">Couple Size Code</div>
                 <div className="font-bold text-orange-700 dark:text-orange-400 py-1 border-b border-gray-300 dark:border-gray-600">Individual Sizes</div>
                 {coupleSizeCodes.map((pair) => (
-                  <>
+                  <div key={pair.code} className="contents"> {/* Use contents to avoid extra div that breaks grid */}
                     <div className="py-1">{pair.code}</div>
                     <div className="py-1 font-medium">{pair.individual}</div>
-                  </>
+                  </div>
                 ))}
               </div>
             </CardContent>
