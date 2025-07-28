@@ -343,7 +343,7 @@ export default function AdminPage() {
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label>Gold Rate (₹/gm)</label>
+                                    <label>Gold Rate (₹/10 gm)</label>
                                     <Input
                                         value={rates.gold}
                                         onChange={(e) => setRates({ ...rates, gold: parseFloat(e.target.value) })}

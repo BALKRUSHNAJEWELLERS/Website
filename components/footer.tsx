@@ -9,13 +9,17 @@ export function Footer() {
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">BJ</span>
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">bkj</span>
+            </div>
+            <div className="hidden md:block">
+              <span className="text-xl font-bold text-red-700 dark:text-white">
+                BALKRUSHNA
+              </span>
+              <div className="text-sm text-red-700 font-medium">
+                JEWELLERS
               </div>
-              <div>
-                <span className="text-xl font-bold">BALKRUSHNA</span>
-                <div className="text-sm text-orange-400 font-medium">JEWELLERS</div>
-              </div>
+            </div>
             </div>
             <p className="text-gray-300 mb-4">
               Premium quality jewelry with 25+ years of trust and excellence in craftsmanship.

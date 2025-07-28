@@ -17,6 +17,8 @@ interface MetalRate {
   gold: number;
   silver: number;
   lastUpdated: string;
+  previousGold?: number; // Now optional as it might not be there on initial fetch if no data
+  previousSilver?: number; // Now optional as it might not be there on initial fetch if no data
 }
 
 interface SliderItem {
@@ -35,8 +37,57 @@ interface StoryItem {
   link: string;
 }
 
-// --- MobileStory Component (Updated for Dynamic Data) ---
-const staticStoryItems: StoryItem[] = [];
+// --- MobileStory Component (Moved Outside HomePage) ---
+const staticStoryItems: StoryItem[] = [
+  {
+    id: "daily-wear",
+    image:
+      "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
+    title: "Daily Wear",
+    link: "/catalog/daily-wear",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+  {
+    id: "latest",
+    image:
+      "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
+    title: "Latest",
+    link: "/catalog/latest",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+  {
+    id: "new-arrivals",
+    image:
+      "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTbbo1co3U&usqp=CAc",
+    title: "New Arrivals",
+    link: "/catalog/new-arrivals",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+  {
+    id: "gold",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
+    title: "Gold",
+    link: "/catalog/gold",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+  {
+    id: "diamond",
+    image:
+      "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
+    title: "Diamond",
+    link: "/catalog/diamond",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+  {
+    id: "rings",
+    image:
+      "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
+    title: "Rings",
+    link: "/catalog/rings",
+    subtitle: "Daily updates on 24k and 22k gold prices.",
+  },
+];
 
 function MobileStory() {
   const [dynamicStories, setDynamicStories] = useState<StoryItem[]>([]);
@@ -133,9 +184,9 @@ function MobileStory() {
                         className="absolute inset-0 rounded-full p-1 transition-opacity duration-300"
                         style={{
                           background: `linear-gradient(45deg, 
-          hsl(${(index * 60) % 360}, 70%, 60%), 
-          hsl(${(index * 60 + 60) % 360}, 70%, 60%)
-        )`,
+              hsl(${(index * 60) % 360}, 70%, 60%), 
+              hsl(${(index * 60 + 60) % 360}, 70%, 60%)
+            )`,
                         }}
                       >
                         {/* Inner White Ring */}
@@ -214,11 +265,13 @@ function MobileStory() {
 
 // --- HomePage Component ---
 export default function HomePage() {
-  const [previousRates, setPreviousRates] = useState<MetalRate | null>(null);
+  // Initialize rates with default values, including previous values
   const [rates, setRates] = useState<MetalRate>({
     gold: 6250,
     silver: 78,
     lastUpdated: new Date().toISOString(),
+    previousGold: 6250, // Default to current gold if no previous
+    previousSilver: 78, // Default to current silver if no previous
   });
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -233,17 +286,15 @@ export default function HomePage() {
     setHasMounted(true);
   }, []);
 
-  // Consolidated and corrected useEffect for fetching rates
+  // Consolidated useEffect for fetching rates
   useEffect(() => {
     const fetchRates = async () => {
       try {
         const response = await fetch("/api/rates");
         if (response.ok) {
-          const data = await response.json();
-          setRates((prevRates) => {
-            setPreviousRates(prevRates);
-            return data;
-          });
+          const data: MetalRate = await response.json();
+          // Update rates, which now includes previousGold and previousSilver
+          setRates(data);
         }
       } catch (error) {
         console.error("Failed to fetch rates:", error);
@@ -251,7 +302,7 @@ export default function HomePage() {
     };
 
     fetchRates();
-    const interval = setInterval(fetchRates, 300000);
+    const interval = setInterval(fetchRates, 300000); // Fetch every 5 minutes
     return () => clearInterval(interval);
   }, []);
 
@@ -350,6 +401,7 @@ export default function HomePage() {
                 Live Rates
               </h2>
             </div>
+
             {/* Gold */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
@@ -361,14 +413,16 @@ export default function HomePage() {
                   <span className="text-sm font-normal">/ gram</span>
                 </span>
               </div>
-              {previousRates ? (
-                rates.gold > previousRates.gold ? (
+              {/* Check if previousGold exists before comparing */}
+              {rates.previousGold !== undefined ? (
+                rates.gold > rates.previousGold ? (
                   <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.gold < previousRates.gold ? (
+                ) : rates.gold < rates.previousGold ? (
                   <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
                 ) : null
               ) : null}
             </div>
+
             {/* Silver */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
@@ -380,14 +434,16 @@ export default function HomePage() {
                   <span className="text-sm font-normal">/ gram</span>
                 </span>
               </div>
-              {previousRates ? (
-                rates.silver > previousRates.silver ? (
+              {/* Check if previousSilver exists before comparing */}
+              {rates.previousSilver !== undefined ? (
+                rates.silver > rates.previousSilver ? (
                   <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.silver < previousRates.silver ? (
+                ) : rates.silver < rates.previousSilver ? (
                   <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
                 ) : null
               ) : null}
             </div>
+
             {hasMounted && (
               <div className="absolute bottom-3 right-4 text-xs text-gray-500 dark:text-gray-400">
                 Last updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
@@ -410,32 +466,34 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col">
                 <span className="text-xs font-medium">Gold (24K)</span>
-                <span className="text-lg font-bold">
+                <span className="text-lg font-bold flex items-center gap-1">
                   ₹{rates.gold}{" "}
                   <span className="text-xs font-normal">/ gram</span>
+                  {/* Conditional rendering for mobile gold trend */}
+                  {rates.previousGold !== undefined &&
+                  rates.gold > rates.previousGold ? (
+                    <TrendingUp className="h-4 w-4 text-green-400" />
+                  ) : rates.previousGold !== undefined &&
+                    rates.gold < rates.previousGold ? (
+                    <TrendingDown className="h-4 w-4 text-red-400" />
+                  ) : null}
                 </span>
               </div>
-              {previousRates ? (
-                rates.gold > previousRates.gold ? (
-                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.gold < previousRates.gold ? (
-                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
-                ) : null
-              ) : null}
               <div className="flex flex-col">
                 <span className="text-xs font-medium">Silver</span>
-                <span className="text-lg font-bold">
+                <span className="text-lg font-bold flex items-center gap-1">
                   ₹{rates.silver}{" "}
                   <span className="text-xs font-normal">/ gram</span>
+                  {/* Conditional rendering for mobile silver trend */}
+                  {rates.previousSilver !== undefined &&
+                  rates.silver > rates.previousSilver ? (
+                    <TrendingUp className="h-4 w-4 text-green-400" />
+                  ) : rates.previousSilver !== undefined &&
+                    rates.silver < rates.previousSilver ? (
+                    <TrendingDown className="h-4 w-4 text-red-400" />
+                  ) : null}
                 </span>
               </div>
-              {previousRates ? (
-                rates.silver > previousRates.silver ? (
-                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.silver < previousRates.silver ? (
-                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
-                ) : null
-              ) : null}
             </div>
           </div>
         </div>
