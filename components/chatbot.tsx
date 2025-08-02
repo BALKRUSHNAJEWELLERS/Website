@@ -1,76 +1,17 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-  ReactNode,
-} from "react";
-
+import { useGoldRates } from "@/context/GoldRatesContext"; // ✅ Import shared context
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, X, Send, Sparkles, Bot, User } from "lucide-react";
 
-/** ============================
- *  Context: GoldRates
- * =============================*/
-
-interface MetalRate {
-  gold: number;
-  silver: number;
-  lastUpdated: string;
-}
-
-const GoldRatesContext = createContext<MetalRate | null>(null);
-
-export function useGoldRates() {
-  const context = useContext(GoldRatesContext);
-  if (!context) {
-    console.warn("useGoldRates must be used within a GoldRatesProvider. Using fallback values.");
-    return { gold: 0, silver: 0, lastUpdated: new Date().toISOString() };
-  }
-  return context;
-}
-
-export function GoldRatesProvider({ children }: { children: ReactNode }) {
-  const [rates, setRates] = useState<MetalRate>({
-    gold: 6250,
-    silver: 78,
-    lastUpdated: new Date().toISOString(),
-  });
-
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const res = await fetch("/api/rates");
-        if (res.ok) {
-          const data = await res.json();
-          setRates(data);
-        } else {
-          console.error("Server error while fetching rates");
-        }
-      } catch (err) {
-        console.error("Network error while fetching rates:", err);
-      }
-    };
-    fetchRates();
-    const interval = setInterval(fetchRates, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return <GoldRatesContext.Provider value={rates}>{children}</GoldRatesContext.Provider>;
-}
-
-/** ============================
- *  ChatBot Component
- * =============================*/
-
 const TypingIndicator = () => (
   <div className="flex items-center space-x-1 p-2">
     <Bot className="h-6 w-6 text-amber-500" />
-    <span className="text-sm text-gray-500 dark:text-gray-400">Balkrushna AI is typing</span>
+    <span className="text-sm text-gray-500 dark:text-gray-400">
+      Balkrushna AI is typing
+    </span>
     <div className="flex space-x-1">
       <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
       <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -81,10 +22,12 @@ const TypingIndicator = () => (
 
 export function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ sender: "user" | "bot"; text: string }[]>([]);
+  const [messages, setMessages] = useState<
+    { sender: "user" | "bot"; text: string }[]
+  >([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const rates = useGoldRates();
+  const rates = useGoldRates(); // ✅ Uses the shared provider context
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -103,47 +46,104 @@ export function ChatBot() {
   }, [messages, isTyping]);
 
   const quickActions = [
-    "What are the live gold rates?",
+    "What are the gold and silver rates?",
+    "What is the gold rate today?",
+    "What is the silver rate today?",
     "Tell me about the Gold Scheme",
     "Where is the store located?",
   ];
 
-  const generateBotResponse = (input: string): string => {
+  const generateBotResponse = (
+    input: string
+  ): { text: string; redirect?: string } => {
     const lower = input.toLowerCase();
 
-    if (lower.includes("gold rate") || lower.includes("gold price")) {
-      return `Current **Gold Rate**: ₹${rates.gold}/gram (24K)\nLast Updated: ${new Date(
-        rates.lastUpdated
-      ).toLocaleTimeString()}`;
+    if (
+      lower.includes("gold and silver") ||
+      lower.includes("both rates") ||
+      (lower.includes("gold") && lower.includes("silver"))
+    ) {
+      return {
+        text: `Current Rates:\n\n**Gold**: ₹${
+          rates?.gold
+        }/gram (24K)\n**Silver**: ₹${
+          rates?.silver
+        }/gram\nLast Updated: ${new Date(
+          rates?.lastUpdated ?? ""
+        ).toLocaleTimeString()}`,
+      };
     }
 
-    if (lower.includes("silver rate") || lower.includes("silver price")) {
-      return `Current **Silver Rate**: ₹${rates.silver}/gram\nLast Updated: ${new Date(
-        rates.lastUpdated
-      ).toLocaleTimeString()}`;
+    if (
+      lower.includes("gold rate") ||
+      lower.includes("gold price") ||
+      (lower.includes("gold") && !lower.includes("scheme"))
+    ) {
+      return {
+        text: `Current **Gold Rate**: ₹${
+          rates?.gold
+        }/gram (24K)\nLast Updated: ${new Date(
+          rates?.lastUpdated ?? ""
+        ).toLocaleTimeString()}`,
+      };
+    }
+
+    if (
+      lower.includes("silver rate") ||
+      lower.includes("silver price") ||
+      lower.includes("silver")
+    ) {
+      return {
+        text: `Current **Silver Rate**: ₹${
+          rates?.silver
+        }/gram\nLast Updated: ${new Date(
+          rates?.lastUpdated ?? ""
+        ).toLocaleTimeString()}`,
+      };
     }
 
     if (lower.includes("scheme") || lower.includes("gold scheme")) {
-      return `We have a wonderful **Gold Schemes for you** that allows you to invest in gold monthly and redeem it for jewelry. More details on our [Gold Scheme page](/gold-scheme).`;
+      return {
+        text: `Sure! Redirecting you to our Gold Scheme page...`,
+        redirect: "/gold-scheme",
+      };
     }
 
-    if (lower.includes("store") || lower.includes("location") || lower.includes("address")) {
-      return `Our store is located Gandhi Rd, Ganotri Society,Himatnagar, Gujarat 380001 India**. We'd love to welcome you!`;
+    if (
+      lower.includes("store") ||
+      lower.includes("location") ||
+      lower.includes("address")
+    ) {
+      return {
+        text: `Our store is located at **Gandhi Rd, Ganotri Society, Himatnagar, Gujarat 380001, India**. We'd love to welcome you!`,
+      };
     }
 
-    if (lower.includes("timing") || lower.includes("hours") || lower.includes("open")) {
-      return `Our store hours are **10:00 AM to 8:00 PM, Monday to Saturday**. Closed on Sundays.`;
+    if (
+      lower.includes("timing") ||
+      lower.includes("hours") ||
+      lower.includes("open")
+    ) {
+      return {
+        text: `Our store hours are **10:00 AM to 8:00 PM, Monday to Saturday**. Closed on Sundays.`,
+      };
     }
 
     if (lower.includes("hello") || lower.includes("hi")) {
-      return `Hello there! How can I assist you with your jewelry needs today?`;
+      return {
+        text: `Hello there! How can I assist you with your jewelry needs today?`,
+      };
     }
 
     if (lower.includes("thank")) {
-      return `You're welcome! Let me know if there's anything else.`;
+      return {
+        text: `You're welcome! Let me know if there's anything else.`,
+      };
     }
 
-    return `I'm not sure how to answer that yet. Please ask me about gold rates, store info, or our schemes.`;
+    return {
+      text: `I'm not sure how to answer that yet. Please ask me about gold rates, silver rates, store info, or our schemes.`,
+    };
   };
 
   const handleSendMessage = (text: string) => {
@@ -155,9 +155,15 @@ export function ChatBot() {
     setIsTyping(true);
 
     setTimeout(() => {
-      const botResponse = generateBotResponse(userMessage);
-      setMessages((prev) => [...prev, { sender: "bot", text: botResponse }]);
+      const { text: botText, redirect } = generateBotResponse(userMessage);
+      setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
       setIsTyping(false);
+
+      if (redirect) {
+        setTimeout(() => {
+          window.location.href = redirect;
+        }, 1000);
+      }
     }, 1000);
   };
 
@@ -202,7 +208,10 @@ export function ChatBot() {
                         : "bg-gray-100 dark:bg-zinc-700 text-gray-900 dark:text-white rounded-bl-none"
                     }`}
                     dangerouslySetInnerHTML={{
-                      __html: msg.text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                      __html: msg.text.replace(
+                        /\*\*(.*?)\*\*/g,
+                        "<strong>$1</strong>"
+                      ),
                     }}
                   />
                   {msg.sender === "user" && (
@@ -214,20 +223,21 @@ export function ChatBot() {
               ))}
               {isTyping && <TypingIndicator />}
               <div ref={chatEndRef} />
-              {messages.length > 0 && messages[messages.length - 1].sender === "bot" && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {quickActions.map((action, i) => (
-                    <Button
-                      key={i}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSendMessage(action)}
-                    >
-                      {action}
-                    </Button>
-                  ))}
-                </div>
-              )}
+              {messages.length > 0 &&
+                messages[messages.length - 1].sender === "bot" && (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {quickActions.map((action, i) => (
+                      <Button
+                        key={i}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSendMessage(action)}
+                      >
+                        {action}
+                      </Button>
+                    ))}
+                  </div>
+                )}
             </CardContent>
 
             <div className="p-4 border-t border-gray-200 dark:border-zinc-700">

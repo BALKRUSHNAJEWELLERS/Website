@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
+import { ChatBot } from "@/components/chatbot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,8 +27,11 @@ export default function RootLayout({
             {/* ✅ now this is client-safe */}
             <div className="min-h-screen flex flex-col dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900">
               <Navbar />
-              <main className="flex-1 dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900">{children}</main>
+              <main className="flex-1 dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900">
+                {children}
+              </main>
               <Footer />
+              <ChatBot />
             </div>
           </AppProviders>
         </ThemeProvider>
