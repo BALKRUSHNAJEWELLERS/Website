@@ -1,7 +1,8 @@
 "use client";
 
-import { useGoldRates } from "@/context/GoldRatesContext"; // ✅ Import shared context
+import { useGoldRates } from "@/context/GoldRatesContext";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation"; // Optional for smooth redirect in App Router
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, X, Send, Sparkles, Bot, User } from "lucide-react";
@@ -27,8 +28,9 @@ export function ChatBot() {
   >([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const rates = useGoldRates(); // ✅ Uses the shared provider context
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const rates = useGoldRates();
+  const router = useRouter(); // App Router navigation
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -57,6 +59,14 @@ export function ChatBot() {
     input: string
   ): { text: string; redirect?: string } => {
     const lower = input.toLowerCase();
+
+    // ✅ Scheme logic first to avoid gold rate fallback
+    if (lower.includes("scheme") || lower.includes("gold scheme")) {
+      return {
+        text: `Sure! Redirecting you to our Gold Scheme page...`,
+        redirect: "/gold-scheme",
+      };
+    }
 
     if (
       lower.includes("gold and silver") ||
@@ -99,13 +109,6 @@ export function ChatBot() {
         }/gram\nLast Updated: ${new Date(
           rates?.lastUpdated ?? ""
         ).toLocaleTimeString()}`,
-      };
-    }
-
-    if (lower.includes("scheme") || lower.includes("gold scheme")) {
-      return {
-        text: `Sure! Redirecting you to our Gold Scheme page...`,
-        redirect: "/gold-scheme",
       };
     }
 
@@ -161,7 +164,8 @@ export function ChatBot() {
 
       if (redirect) {
         setTimeout(() => {
-          window.location.href = redirect;
+          router.push(redirect); // ✅ Use this in App Router
+          // window.location.href = redirect; // Or this for Pages Router
         }, 1000);
       }
     }, 1000);
@@ -169,6 +173,7 @@ export function ChatBot() {
 
   return (
     <>
+      {/* Floating Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsOpen(!isOpen)}
@@ -178,8 +183,9 @@ export function ChatBot() {
         </Button>
       </div>
 
+      {/* Chat UI */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-full max-w-sm">
+        <div className="fixed bottom-24 left-4 right-4 z-50 mx-auto w-auto max-w-sm sm:right-6 sm:left-auto">
           <Card className="flex flex-col h-[60vh] rounded-2xl shadow-2xl bg-white dark:bg-zinc-900">
             <CardHeader className="bg-amber-500 p-4 rounded-t-2xl text-white">
               <div className="flex items-center gap-3">
