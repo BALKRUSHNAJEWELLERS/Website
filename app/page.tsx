@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Crown, Sparkles, Gem } from "lucide-react";
+import { Crown, Sparkles, Gem, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +12,14 @@ import {
   TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
+import { Navbar } from "@/components/navbar";
 
 interface MetalRate {
   gold: number;
   silver: number;
   lastUpdated: string;
-  previousGold?: number; // Now optional as it might not be there on initial fetch if no data
-  previousSilver?: number; // Now optional as it might not be there on initial fetch if no data
+  previousGold?: number;
+  previousSilver?: number;
 }
 
 interface SliderItem {
@@ -37,7 +38,7 @@ interface StoryItem {
   link: string;
 }
 
-// --- MobileStory Component (Moved Outside HomePage) ---
+// Static story items
 const staticStoryItems: StoryItem[] = [
   {
     id: "daily-wear",
@@ -45,7 +46,7 @@ const staticStoryItems: StoryItem[] = [
       "https://jewelemarket.com/cdn/shop/files/11055169GL_71cc0458-b756-4e58-8897-be71847f9e35.jpg?v=1738992800",
     title: "Daily Wear",
     link: "/catalog/daily-wear",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Elegant pieces for everyday elegance",
   },
   {
     id: "latest",
@@ -53,7 +54,7 @@ const staticStoryItems: StoryItem[] = [
       "https://knowyourtown.co.in/wp-content/uploads/2024/05/necklace33-2-800x445.jpg",
     title: "Latest",
     link: "/catalog/latest",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Trending designs just for you",
   },
   {
     id: "new-arrivals",
@@ -61,7 +62,7 @@ const staticStoryItems: StoryItem[] = [
       "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS5IP-d0axrv1DX_2shjvF9HxBeIXKSTgfI8x5MMgjY2JrIwKSTgfI8x5MMgjY2JrIwKXiONzMMlIbFOlIzlRZfwIIDl5wSD5e3uXhLpTQxbcRDc9EVRuZjv4P9i0Q303FONHhlsU2WEAu9Btu8XanuOTbbo1co3U&usqp=CAc",
     title: "New Arrivals",
     link: "/catalog/new-arrivals",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Fresh designs, timeless beauty",
   },
   {
     id: "gold",
@@ -69,7 +70,7 @@ const staticStoryItems: StoryItem[] = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcQli4ZQrSeVzGyYe2WfeCby-pnFzS1DZWRtYA&s",
     title: "Gold",
     link: "/catalog/gold",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Pure gold, pure elegance",
   },
   {
     id: "diamond",
@@ -77,7 +78,7 @@ const staticStoryItems: StoryItem[] = [
       "https://www.urvaa.com/wp-content/uploads/2024/02/WhatsApp-Image-2024-02-10-at-13.51.25-2.jpeg",
     title: "Diamond",
     link: "/catalog/diamond",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Brilliance that captivates",
   },
   {
     id: "rings",
@@ -85,10 +86,11 @@ const staticStoryItems: StoryItem[] = [
       "https://accessorizelondon.in/cdn/shop/files/MA-10001458603_1_91e7d176-7ade-41f4-946e-b43c316a9156.jpg?v=1714635582",
     title: "Rings",
     link: "/catalog/rings",
-    subtitle: "Daily updates on 24k and 22k gold prices.",
+    subtitle: "Symbols of eternal love",
   },
 ];
 
+// Mobile Story Component
 function MobileStory() {
   const [dynamicStories, setDynamicStories] = useState<StoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,20 +100,14 @@ function MobileStory() {
     const fetchDynamicStories = async () => {
       try {
         setLoading(true);
-        // Use the dedicated stories API endpoint
         const res = await fetch("/api/stories");
-
         if (!res.ok) {
           throw new Error("Failed to fetch stories");
         }
-
         const storiesFromAPI = await res.json();
-        console.log("data", storiesFromAPI);
-
         setDynamicStories(storiesFromAPI);
       } catch (error) {
         console.error("Failed to load dynamic stories", error);
-        // Fallback to static stories if API fails
         setDynamicStories([]);
       } finally {
         setLoading(false);
@@ -121,7 +117,6 @@ function MobileStory() {
     fetchDynamicStories();
   }, []);
 
-  // Combine static and dynamic stories, ensuring no duplicates by ID
   const finalStories = [
     ...staticStoryItems.filter(
       (staticItem) => !dynamicStories.some((dyn) => dyn.id === staticItem.id)
@@ -131,30 +126,21 @@ function MobileStory() {
 
   const handleStoryClick = (storyId: string, link: string) => {
     setClickedStory(storyId);
-
-    // Add a small delay for animation before navigation
     setTimeout(() => {
-      //in link first letter need capital
-
       window.location.href = link;
     }, 200);
   };
 
   if (loading) {
     return (
-      <section className="md:hidden py-6 bg-gradient-to-r from-gray-50 to-white">
+      <section className="md:hidden py-4 bg-gradient-to-r from-rose-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4">
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-            {/* Loading skeleton */}
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="flex-shrink-0">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-400 to-pink-400 p-1 animate-pulse">
-                      <div className="w-full h-full rounded-full bg-gray-200"></div>
-                    </div>
-                  </div>
-                  <div className="w-20 h-4 bg-gray-200 animate-pulse rounded"></div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-rose-200 to-amber-200 animate-pulse"></div>
+                  <div className="w-16 h-3 bg-gray-200 animate-pulse rounded"></div>
                 </div>
               </div>
             ))}
@@ -165,38 +151,34 @@ function MobileStory() {
   }
 
   return (
-    <section className="md:hidden py-6 bg-gradient-to-r from-gray-50 to-white">
+    <section className="md:hidden py-4 bg-gradient-to-r from-rose-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
-        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {finalStories.map((story, index) => (
             <div
               key={story.id}
               className="flex-shrink-0 cursor-pointer"
               onClick={() => handleStoryClick(story.id, story.link)}
             >
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-2">
                 <div className="relative group">
-                  {/* Rotating Dotted Border Ring */}
-                  <div className="relative w-24 h-24">
-                    {/* Static gradient background - only show when NOT clicked */}
+                  <div className="relative w-20 h-20">
                     {clickedStory !== story.id && (
                       <div
-                        className="absolute inset-0 rounded-full p-1 transition-opacity duration-300"
+                        className="absolute inset-0 rounded-full p-0.5 transition-opacity duration-300"
                         style={{
                           background: `linear-gradient(45deg, 
-              hsl(${(index * 60) % 360}, 70%, 60%), 
-              hsl(${(index * 60 + 60) % 360}, 70%, 60%)
-            )`,
+                          hsl(${(index * 60) % 360}, 70%, 60%), 
+                          hsl(${(index * 60 + 60) % 360}, 70%, 60%)
+                        )`,
                         }}
                       >
-                        {/* Inner White Ring */}
                         <div className="w-full h-full rounded-full bg-white p-0.5">
-                          {/* Image Container */}
                           <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 relative">
                             <img
                               src={story.image || "/placeholder.svg"}
                               alt={story.title}
-                              className="w-full h-full p-4 object-cover transition-all duration-300 group-hover:scale-105"
+                              className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src =
@@ -208,17 +190,14 @@ function MobileStory() {
                         </div>
                       </div>
                     )}
-
-                    {/* When clicked - show only image with white background and rotating dotted border */}
                     {clickedStory === story.id && (
                       <>
-                        {/* White background with image */}
                         <div className="absolute inset-0 rounded-full bg-white p-0.5">
                           <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 relative">
                             <img
                               src={story.image || "/placeholder.svg"}
                               alt={story.title}
-                              className="w-full h-full p-4 object-cover scale-95 brightness-90"
+                              className="w-full h-full object-cover scale-95 brightness-90"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src =
@@ -228,8 +207,6 @@ function MobileStory() {
                             />
                           </div>
                         </div>
-
-                        {/* Clean Rotating Dotted Border */}
                         <div
                           className="absolute inset-0 rounded-full animate-spin"
                           style={{
@@ -243,13 +220,11 @@ function MobileStory() {
                     )}
                   </div>
                 </div>
-
-                {/* Story Title */}
                 <span
-                  className={`text-xs font-medium text-center max-w-[90px] leading-tight transition-all duration-200 ${
+                  className={`text-xs font-medium text-center max-w-[80px] leading-tight transition-all duration-200 ${
                     clickedStory === story.id
-                      ? "text-purple-600 scale-95 font-semibold"
-                      : "text-gray-700 group-hover:text-purple-600"
+                      ? "text-rose-600 scale-95 font-semibold"
+                      : "text-gray-700 group-hover:text-rose-600 dark:text-gray-300"
                   }`}
                 >
                   {story.title}
@@ -263,16 +238,15 @@ function MobileStory() {
   );
 }
 
-// --- HomePage Component ---
 export default function HomePage() {
-  // Initialize rates with default values, including previous values
   const [rates, setRates] = useState<MetalRate>({
-    gold: 6250,
-    silver: 78,
+    gold: 6261,
+    silver: 81,
     lastUpdated: new Date().toISOString(),
-    previousGold: 6250, // Default to current gold if no previous
-    previousSilver: 78, // Default to current silver if no previous
+    previousGold: 6250,
+    previousSilver: 78,
   });
+
   const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
@@ -280,20 +254,16 @@ export default function HomePage() {
 
   useEffect(() => {
     setIsVisible(true);
-  }, []);
-
-  useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  // Consolidated useEffect for fetching rates
+  // Fetch rates
   useEffect(() => {
     const fetchRates = async () => {
       try {
         const response = await fetch("/api/rates");
         if (response.ok) {
           const data: MetalRate = await response.json();
-          // Update rates, which now includes previousGold and previousSilver
           setRates(data);
         }
       } catch (error) {
@@ -302,10 +272,11 @@ export default function HomePage() {
     };
 
     fetchRates();
-    const interval = setInterval(fetchRates, 300000); // Fetch every 5 minutes
+    const interval = setInterval(fetchRates, 300000);
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch slider items
   useEffect(() => {
     const fetchSliderItems = async () => {
       try {
@@ -315,8 +286,6 @@ export default function HomePage() {
         if (response.ok) {
           const data = await response.json();
           setSliderItems(data);
-        } else {
-          console.error("Failed to load sliders");
         }
       } catch (error) {
         console.error("Slider fetch error:", error);
@@ -326,57 +295,46 @@ export default function HomePage() {
     fetchSliderItems();
   }, []);
 
-  const features = [
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Certified Quality",
-      description:
-        "All our jewelry comes with proper certification and quality assurance",
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: <Award className="h-8 w-8" />,
-      title: "25+ Years Experience",
-      description:
-        "Trusted by generations with decades of craftsmanship excellence",
-      gradient: "from-purple-500 to-fuchsia-500",
-    },
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Customer First",
-      description:
-        "Dedicated customer service and lifetime maintenance support",
-      gradient: "from-green-500 to-teal-500",
-    },
-    {
-      icon: <Star className="h-8 w-8" />,
-      title: "Premium Designs",
-      description: "Exclusive designs crafted by master artisans",
-      gradient: "from-pink-500 to-red-500",
-    },
-  ];
-
   const defaultSlider = [
     {
       id: "default-1",
-      image: "/placeholder.svg?height=800&width=1200",
-      title: "Discover Our Exquisite Diamond Jewellery",
-      subtitle: "Radiance in Rhythm - Timeless elegance for every occasion",
+      image:
+        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      title: "Effortless Elegance, Every Day",
+      subtitle: "Discover 7000+ Designs in 18KT, Made for Daily Moments",
       link: "/catalog",
     },
     {
       id: "default-2",
-      image: "/placeholder.svg?height=800&width=1200",
+      image:
+        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
       title: "Timeless Gold Collection",
       subtitle: "Crafted with precision, designed for perfection",
       link: "/catalog/gold",
     },
     {
       id: "default-3",
-      image: "/placeholder.svg?height=800&width=1200",
+      image:
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       title: "Bridal Collection",
       subtitle: "Make your special day even more memorable",
       link: "/catalog/wedding",
+    },
+    {
+      id: "default-4",
+      image:
+        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
+      title: "Festival Collection",
+      subtitle: "Celebrate every moment with our festive jewelry",
+      link: "/catalog/festival",
+    },
+    {
+      id: "default-5",
+      image:
+        "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      title: "Premium Ring Collection",
+      subtitle: "Symbols of love and commitment",
+      link: "/catalog/rings",
     },
   ];
 
@@ -389,110 +347,164 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [slidesToShow.length]);
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slidesToShow.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + slidesToShow.length) % slidesToShow.length
+    );
+  };
+
+  const collections = [
+    {
+      id: "earrings",
+      title: "Stunning Every Ear",
+      subtitle: "Elegant earrings for every occasion",
+      image: "/placeholder.svg?height=400&width=600&text=Stunning+Earrings",
+      link: "/catalog/earrings",
+      size: "large",
+    },
+    {
+      id: "rings",
+      title: "The Ring Edit",
+      subtitle: "Symbols of eternal love",
+      image: "/placeholder.svg?height=300&width=400&text=Beautiful+Rings",
+      link: "/catalog/rings",
+      size: "medium",
+    },
+    {
+      id: "chains",
+      title: "Daily Wear Chains",
+      subtitle: "Perfect for everyday elegance",
+      image: "/placeholder.svg?height=300&width=400&text=Gold+Chains",
+      link: "/catalog/chains",
+      size: "medium",
+    },
+    {
+      id: "necklaces",
+      title: "Statement Necklaces",
+      subtitle: "Make a bold impression",
+      image: "/placeholder.svg?height=400&width=600&text=Statement+Necklaces",
+      link: "/catalog/necklaces",
+      size: "large",
+    },
+  ];
+
   return (
-    <div className="min-h-screen">
-      {/* Live Rates Section */}
-      <section className="hidden md:block bg-gradient-to-br from-yellow-100 via-amber-200 to-orange-300 dark:from-zinc-800 dark:via-zinc-700 dark:to-yellow-900 text-gray-900 dark:text-white py-20 transition-colors duration-500 mb-12">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-rose-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
+      {/* Navbar */}
+      
+
+      {/* Live Rates Section - Desktop */}
+      <section className="hidden md:block bg-gradient-to-r from-amber-50 via-rose-50 to-amber-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <div className="relative max-w-md mx-auto bg-white/80 dark:bg-white/10 backdrop-blur-lg rounded-xl p-6 shadow-lg space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-              <h2 className="text-lg font-semibold uppercase tracking-wide">
-                Live Rates
-              </h2>
-            </div>
+          <div className="flex justify-center">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-rose-100 dark:bg-gray-800/90 dark:border-gray-700">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full animate-pulse shadow-lg"></div>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Live Rates
+                  </span>
+                </div>
 
-            {/* Gold */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                  Gold (24K)
-                </span>
-                <span className="text-xl font-bold">
-                  ₹{rates.gold}{" "}
-                  <span className="text-sm font-normal">/ gram</span>
-                </span>
-              </div>
-              {/* Check if previousGold exists before comparing */}
-              {rates.previousGold !== undefined ? (
-                rates.gold > rates.previousGold ? (
-                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.gold < rates.previousGold ? (
-                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
-                ) : null
-              ) : null}
-            </div>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
+                        Gold (24K)
+                      </div>
+                      <div className="text-lg font-bold text-amber-600">
+                        ₹{rates.gold}
+                      </div>
+                    </div>
+                    {rates.previousGold !== undefined &&
+                      rates.gold !== rates.previousGold &&
+                      (rates.gold > rates.previousGold ? (
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4 text-red-500" />
+                      ))}
+                  </div>
 
-            {/* Silver */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                  Silver
-                </span>
-                <span className="text-xl font-bold">
-                  ₹{rates.silver}{" "}
-                  <span className="text-sm font-normal">/ gram</span>
-                </span>
-              </div>
-              {/* Check if previousSilver exists before comparing */}
-              {rates.previousSilver !== undefined ? (
-                rates.silver > rates.previousSilver ? (
-                  <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-300" />
-                ) : rates.silver < rates.previousSilver ? (
-                  <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-300" />
-                ) : null
-              ) : null}
-            </div>
+                  <div className="w-px h-8 bg-gray-200 dark:bg-gray-700"></div>
 
-            {hasMounted && (
-              <div className="absolute bottom-3 right-4 text-xs text-gray-500 dark:text-gray-400">
-                Last updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
+                  <div className="flex items-center gap-2">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
+                        Silver
+                      </div>
+                      <div className="text-lg font-bold text-gray-600 dark:text-gray-400">
+                        ₹{rates.silver}
+                      </div>
+                    </div>
+                    {rates.previousSilver !== undefined &&
+                      rates.silver !== rates.previousSilver &&
+                      (rates.silver > rates.previousSilver ? (
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4 text-red-500" />
+                      ))}
+                  </div>
+                </div>
+
+                {hasMounted && (
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
+                    Updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Live Rates Section - Mobile Only */}
-      <section className="block md:hidden relative py-8 text-white bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900">
+      {/* Live Rates Section - Mobile */}
+      <section className="block md:hidden bg-gradient-to-r from-rose-100 to-amber-100 dark:from-gray-900 dark:to-gray-800 py-4">
         <div className="container mx-auto px-4">
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-lg space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-              <h2 className="text-sm font-semibold uppercase tracking-wide">
-                Live Rates
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <span className="text-xs font-medium">Gold (24K)</span>
-                <span className="text-lg font-bold flex items-center gap-1">
-                  ₹{rates.gold}{" "}
-                  <span className="text-xs font-normal">/ gram</span>
-                  {/* Conditional rendering for mobile gold trend */}
-                  {rates.previousGold !== undefined &&
-                  rates.gold > rates.previousGold ? (
-                    <TrendingUp className="h-4 w-4 text-green-400" />
-                  ) : rates.previousGold !== undefined &&
-                    rates.gold < rates.previousGold ? (
-                    <TrendingDown className="h-4 w-4 text-red-400" />
-                  ) : null}
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg dark:bg-gray-800/90">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-rose-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  Live Rates
                 </span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-medium">Silver</span>
-                <span className="text-lg font-bold flex items-center gap-1">
-                  ₹{rates.silver}{" "}
-                  <span className="text-xs font-normal">/ gram</span>
-                  {/* Conditional rendering for mobile silver trend */}
-                  {rates.previousSilver !== undefined &&
-                  rates.silver > rates.previousSilver ? (
-                    <TrendingUp className="h-4 w-4 text-green-400" />
-                  ) : rates.previousSilver !== undefined &&
-                    rates.silver < rates.previousSilver ? (
-                    <TrendingDown className="h-4 w-4 text-red-400" />
-                  ) : null}
-                </span>
+
+              <div className="flex items-center gap-6">
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Gold 24K
+                  </div>
+                  <div className="text-sm font-bold text-amber-600 flex items-center gap-1">
+                    ₹{rates.gold}
+                    {rates.previousGold !== undefined &&
+                      rates.gold !== rates.previousGold &&
+                      (rates.gold > rates.previousGold ? (
+                        <TrendingUp className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3 text-red-500" />
+                      ))}
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Silver
+                  </div>
+                  <div className="text-sm font-bold text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                    ₹{rates.silver}
+                    {rates.previousSilver !== undefined &&
+                      rates.silver !== rates.previousSilver &&
+                      (rates.silver > rates.previousSilver ? (
+                        <TrendingUp className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3 text-red-500" />
+                      ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -502,211 +514,332 @@ export default function HomePage() {
       {/* Mobile Story Navigation */}
       <MobileStory />
 
-      {/* Hero Slider Section */}
-      <section className="relative">
-        {/* Desktop Hero Slider */}
-        <div className="hidden md:block relative h-[70vh] lg:h-[80vh] overflow-hidden bg-center bg-cover">
-          {slidesToShow.map((item, index) => (
-            <Link
-              href={item.link || "#"}
-              key={item.id}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out cursor-pointer ${
-                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
-              style={{
-                transform: `translateX(${100 * (index - currentSlide)}%)`,
-              }}
-            >
-              <div className="relative w-full h-full">
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10" />
-                {/* Content */}
-                <div className="absolute z-20 left-8 lg:left-16 top-1/2 transform -translate-y-1/2 text-white max-w-2xl">
-                  <h1 className="text-4xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6 drop-shadow-lg">
-                    {item.title}
-                  </h1>
-                  <p className="text-lg lg:text-xl xl:text-2xl mb-8 opacity-90 drop-shadow-md">
-                    {item.subtitle}
-                  </p>
+      {/* Hero Slider Section - Tanishq Style with Proper Preview */}
+      <section className="py-6 bg-gradient-to-b from-amber-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
+        <div className="container mx-auto px-4">
+          {/* Desktop Hero Slider - Tanishq Style */}
+          <div className="hidden md:block">
+            <div className="relative w-full">
+              {/* Navigation Arrows - Positioned over the slider */}
+              <button
+                onClick={prevSlide}
+                className="absolute left-8 top-1/2 transform -translate-y-1/2 z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2.5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <button
+                onClick={nextSlide}
+                className="absolute right-8 top-1/2 transform -translate-y-1/2 z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2.5 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+
+              {/* Outer container for clipping the slides and applying overall border-radius */}
+              <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl">
+                {/* Flex container for all slides, handles the horizontal scrolling */}
+                <div
+                  className="relative h-[450px] flex transition-transform duration-700 ease-in-out"
+                  // Each slide takes 80% width with 0.5% margin on each side (total 1% horizontal margin between slides)
+                  // So, effective slide width is 80% + 1% = 81%
+                  // To center the current slide, we shift it by its position * effectiveSlideWidth
+                  // Then add an offset to bring the center of the first slide to the center of the viewport (if it was the only one)
+                  // Offset = (ViewportWidth - SlideWidth) / 2. Assuming ViewportWidth = 100% and SlideWidth = 80%.
+                  // Offset = (100% - 80%) / 2 = 10%
+                  style={{
+                    transform: `translateX(calc(-${currentSlide * 81}% + 10%))`,
+                  }}
+                >
+                  {/* Render all slides in sequence */}
+                  {slidesToShow.map((item, index) => {
+                    const isCurrent = index === currentSlide; // Check if this is the active slide
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={`flex-shrink-0 w-[80%] mx-[0.5%] h-full rounded-xl shadow-2xl bg-white dark:bg-gray-800 relative transition-all duration-700 ${
+                          isCurrent
+                            ? "scale-100 opacity-100 z-20"
+                            : "scale-90 opacity-70 z-10"
+                        }`}
+                      >
+                        {/* Content inside each slide */}
+                        <div className="relative w-full h-full">
+                          <img
+                            src={
+                              item.image ||
+                              "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-KYjYNWgq9ZOTDy2FmxPPT4ubRgGJcp.png" || // Use the provided reference image as default
+                              "/placeholder.svg"
+                            }
+                            alt={item.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src =
+                                "/placeholder.svg?height=450&width=800&text=Image+Error"; // Fallback on error
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20" />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </Link>
-          ))}
-          {/* Desktop Navigation Dots */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-30 bg-cover ">
-            {slidesToShow.map((_, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentSlide(index);
-                }}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide
-                    ? "bg-white scale-125"
-                    : "bg-white/50 hover:bg-white/80"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+
+              {/* Navigation Dots */}
+              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-30">
+                {slidesToShow.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      index === currentSlide
+                        ? "bg-white scale-125"
+                        : "bg-white/50 hover:bg-white/80"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Hero Slider - Keep existing mobile implementation */}
+          <div className="md:hidden">
+            <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl bg-white dark:bg-gray-800">
+              {slidesToShow.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                    index === currentSlide
+                      ? "opacity-100 z-10"
+                      : "opacity-0 z-0"
+                  }`}
+                >
+                  <div className="relative w-full h-full">
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:from-black/80" />
+
+                   
+                  </div>
+                </div>
+              ))}
+
+              {/* Mobile Navigation Dots */}
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
+                {slidesToShow.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentSlide ? "bg-white" : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-        {/* Mobile Hero Slider */}
-        <div className="md:hidden relative h-[50vh] overflow-hidden">
-          {slidesToShow.map((item, index) => (
-            <Link
-              href={item.link || "#"}
-              key={item.id}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out cursor-pointer ${
-                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
-              style={{
-                transform: `translateX(${100 * (index - currentSlide)}%)`,
-              }}
-            >
-              <div className="relative w-full h-full">
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.title}
-                  // Adjusted object-cover and added object-position to ensure image fills well
-                  className="absolute inset-0 w-full h-full object-cover object-center"
-                />
-                {/* Adjusted gradient for better text visibility on mobile */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
-                {/* Mobile Content - Adjusted positioning and text sizes */}
-                <div className="absolute z-20 bottom-6 left-4 right-4 text-white text-center">
-                  <h1 className="text-xl xs:text-2xl font-bold leading-tight mb-2">
-                    {item.title}
-                  </h1>
-                  <p className="text-xs xs:text-sm mb-4 opacity-90">
-                    {item.subtitle}
-                  </p>
+      </section>
+
+      {/* Collections Section */}
+      <section className="py-16 bg-gradient-to-b from-white to-rose-50 dark:from-gray-800 dark:to-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
+              Balkrushna Collections
+            </h2>
+            <p className="text-lg text-gray-600 font-light dark:text-gray-400">
+              Explore our newly launched collection
+            </p>
+          </div>
+
+          {/* Desktop Collections Grid */}
+          <div className="hidden md:grid grid-cols-12 gap-6 max-w-7xl mx-auto">
+            {/* Large Collection Item 1 */}
+            <div className="col-span-8 row-span-2">
+              <Link href={collections[0].link} className="group block">
+                <div className="relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
+                  <img
+                    src={collections[0].image || "/placeholder.svg"}
+                    alt={collections[0].title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-8 left-8 text-white">
+                    <h3 className="text-3xl font-light mb-2">
+                      {collections[0].title}
+                    </h3>
+                    <p className="text-lg opacity-90 font-light">
+                      {collections[0].subtitle}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-          {/* Mobile Navigation Dots - Adjusted size for better touch */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
-            {slidesToShow.map((_, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentSlide(index);
-                }}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? "bg-white" : "bg-white/50"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
+              </Link>
+            </div>
+
+            {/* Medium Collection Item 1 */}
+            <div className="col-span-4">
+              <Link href={collections[1].link} className="group block">
+                <div className="relative h-44 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
+                  <img
+                    src={collections[1].image || "/placeholder.svg"}
+                    alt={collections[1].title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-light mb-1">
+                      {collections[1].title}
+                    </h3>
+                    <p className="text-sm opacity-90 font-light">
+                      {collections[1].subtitle}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Medium Collection Item 2 */}
+            <div className="col-span-4">
+              <Link href={collections[2].link} className="group block">
+                <div className="relative h-44 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
+                  <img
+                    src={collections[2].image || "/placeholder.svg"}
+                    alt={collections[2].title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-light mb-1">
+                      {collections[2].title}
+                    </h3>
+                    <p className="text-sm opacity-90 font-light">
+                      {collections[2].subtitle}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Large Collection Item 2 */}
+            <div className="col-span-12">
+              <Link href={collections[3].link} className="group block">
+                <div className="relative h-64 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
+                  <img
+                    src={collections[3].image || "/placeholder.svg"}
+                    alt={collections[3].title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-white">
+                    <h3 className="text-3xl font-light mb-2">
+                      {collections[3].title}
+                    </h3>
+                    <p className="text-lg opacity-90 font-light">
+                      {collections[3].subtitle}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile Collections Grid */}
+          <div className="md:hidden space-y-6">
+            {collections.map((collection, index) => (
+              <Link
+                key={collection.id}
+                href={collection.link}
+                className="group block"
+              >
+                <div className="relative h-48 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                  <img
+                    src={collection.image || "/placeholder.svg"}
+                    alt={collection.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-light mb-1">
+                      {collection.title}
+                    </h3>
+                    <p className="text-sm opacity-90 font-light">
+                      {collection.subtitle}
+                    </p>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Our Services Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+      {/* Services Section */}
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
               Our Services
             </h2>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
+            <p className="text-lg text-gray-600 font-light max-w-2xl mx-auto dark:text-gray-400">
               Discover our comprehensive range of jewelry services designed for
               you
             </p>
           </div>
-          {/* Adjusted grid for better mobile stacking and spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
                 title: "Gold Scheme",
                 description:
                   "Join our flexible gold savings scheme and secure your future with gold investments",
-                color: "orange",
+                icon: <Crown className="h-8 w-8" />,
+                color: "from-amber-500 to-yellow-600",
                 link: "/gold-scheme",
-                icon: <Crown className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />,
               },
               {
                 title: "Digital Gold",
                 description:
                   "Buy, sell, and store gold digitally with complete security and transparency",
-                color: "red",
+                icon: <Sparkles className="h-8 w-8" />,
+                color: "from-red-500 to-pink-600",
                 link: "/digital-gold",
-                icon: (
-                  <Sparkles className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />
-                ),
               },
               {
                 title: "Ring Measurement",
                 description:
                   "Find your perfect ring size with our accurate measurement tools",
-                color: "yellow",
+                icon: <Gem className="h-8 w-8" />,
+                color: "from-purple-500 to-indigo-600",
                 link: "/ring-measurement",
-                icon: <Gem className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9" />,
               },
             ].map((service, index) => (
               <Card
                 key={index}
-                className="w-full h-72 sm:h-full sm:w-auto flex flex-col justify-center items-center text-center group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
+                className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-gray-50 overflow-hidden dark:from-gray-800 dark:to-gray-700 rounded-3xl"
               >
-                <div
-                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
-                    service.color === "orange"
-                      ? "from-orange-400 to-orange-600"
-                      : service.color === "red"
-                      ? "from-red-400 to-red-600"
-                      : "from-yellow-400 to-yellow-600"
-                  }`}
-                ></div>
-                {/* Adjusted padding for card content on smaller screens */}
-                <CardContent className="p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
+                <CardContent className="p-8 text-center">
                   <div
-                    className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${
-                      service.color === "orange"
-                        ? "from-orange-400 to-orange-600"
-                        : service.color === "red"
-                        ? "from-red-400 to-red-600"
-                        : "from-yellow-400 to-yellow-600"
-                    } shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                    className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.color} text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
                   >
                     {service.icon}
                   </div>
-                  {/* Adjusted text sizes for better mobile readability */}
-                  <h3
-                    className={`text-base sm:text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center ${
-                      service.color === "orange"
-                        ? "text-orange-600"
-                        : service.color === "red"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
                     {service.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center">
+                  <p className="text-gray-600 mb-6 leading-relaxed dark:text-gray-400">
                     {service.description}
                   </p>
                   <Link href={service.link}>
-                    {/* Adjusted button width for better mobile fit */}
                     <Button
-                      className={`w-full ${
-                        service.color === "orange"
-                          ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
-                          : service.color === "red"
-                          ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
-                          : "bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700"
-                      } text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
+                      className={`bg-gradient-to-r ${service.color} text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-300`}
                     >
-                      {service.color === "orange"
-                        ? "Learn More"
-                        : service.color === "red"
-                        ? "Get Started"
-                        : "Measure Now"}
+                      Learn More
                     </Button>
                   </Link>
                 </CardContent>
@@ -717,94 +850,107 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-teal-100 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div
-            className={`text-center mb-8 sm:mb-12 md:mb-16 transition-all duration-1000 ${
-              isVisible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-          >
-            <div className="flex justify-center mb-3 sm:mb-4">
-              <Crown className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-yellow-500" />
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-rose-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-4">
+              <Crown className="h-12 w-12 text-red-500 dark:text-amber-500" />
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-6">
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
               Why Choose{" "}
-              <span className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent font-medium">
                 BALKRUSHNA JEWELLERS
               </span>
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
+            <p className="text-lg text-gray-600 font-light max-w-3xl mx-auto dark:text-gray-400">
               Experience the finest in jewelry craftsmanship with our commitment
               to quality and excellence
             </p>
           </div>
-          {/* Adjusted grid for better mobile stacking and spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-8">
-            {features.map((feature, index) => (
-              <div
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <Shield className="h-8 w-8" />,
+                title: "Certified Quality",
+                description:
+                  "All our jewelry comes with proper certification and quality assurance",
+                gradient: "from-blue-500 to-cyan-500",
+              },
+              {
+                icon: <Award className="h-8 w-8" />,
+                title: "25+ Years Experience",
+                description:
+                  "Trusted by generations with decades of craftsmanship excellence",
+                gradient: "from-purple-500 to-fuchsia-500",
+              },
+              {
+                icon: <Users className="h-8 w-8" />,
+                title: "Customer First",
+                description:
+                  "Dedicated customer service and lifetime maintenance support",
+                gradient: "from-green-500 to-teal-500",
+              },
+              {
+                icon: <Star className="h-8 w-8" />,
+                title: "Premium Designs",
+                description: "Exclusive designs crafted by master artisans",
+                gradient: "from-red-500 to-rose-500",
+              },
+            ].map((feature, index) => (
+              <Card
                 key={index}
-                className={`group transition-all duration-700 ${
-                  isVisible
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-8 opacity-0"
-                }`}
-                style={{ transitionDelay: `${index * 200}ms` }}
+                className="group hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-3xl"
               >
-                <Card
-                  key={index}
-                  className="w-full h-72 sm:h-full sm:w-auto flex flex-col justify-center items-center text-center group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-0 bg-white dark:bg-gray-800 overflow-hidden relative"
-                >
+                <CardContent className="p-6 text-center">
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  ></div>
-                  {/* Adjusted padding for card content on smaller screens */}
-                  <CardContent className="p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
-                    <div
-                      className={`text-white mb-3 sm:mb-4 md:mb-6 flex justify-center p-3 sm:p-4 rounded-full bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      {feature.icon}
-                    </div>
-                    {/* Adjusted text sizes for better mobile readability */}
-                    <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed text-center">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+                    className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${feature.gradient} text-white mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+                  >
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-200">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed dark:text-gray-400">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section
-        className="py-12 md:py-16 bg-cover bg-center text-white relative"
-        style={{
-          backgroundImage:
-            "url('https://png.pngtree.com/thumb_back/fh260/background/20240929/pngtree-beautiful-diamond-engagement-ring-on-a-dark-sparkling-background-the-focus-image_16280948.jpg')",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/60 "></div>
-        <div className="relative container mx-auto px-4 text-center ">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-lg md:text-xl mb-6 md:mb-8 opacity-90">
-            Get the latest updates on new collections and exclusive offers
-          </p>
-          <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900"
-            />
-            <Button className="bg-white text-red-600 hover:bg-gray-100 px-6">
-              Subscribe
-            </Button>
+      {/* Newsletter Section */}
+      <section className="py-16 relative overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://png.pngtree.com/thumb_back/fh260/background/20240929/pngtree-beautiful-diamond-engagement-ring-on-a-dark-sparkling-background-the-focus-image_16280948.jpg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50" />
+
+        <div className="relative container mx-auto px-4 text-center text-white">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-light mb-4">
+              Stay Updated
+            </h2>
+            <p className="text-lg md:text-xl mb-8 opacity-90 font-light">
+              Get the latest updates on new collections and exclusive offers
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-6 py-3 rounded-full text-gray-900 bg-white/95 backdrop-blur-sm border-0 focus:ring-2 focus:ring-red-500 focus:outline-none"
+              />
+              <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                Subscribe
+              </Button>
+            </div>
           </div>
         </div>
       </section>
