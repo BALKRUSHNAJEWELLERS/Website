@@ -1,6 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Crown, Sparkles, Gem, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Crown,
+  Sparkles,
+  Gem,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  Award,
+  Users,
+  Heart,
+  Star,
+  Phone,
+  Mail,
+  MapPin,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
@@ -125,7 +139,7 @@ function MobileStory() {
 
   if (loading) {
     return (
-      <section className="md:hidden py-4 bg-gradient-to-r from-rose-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
+      <section className="md:hidden py-4 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
             {[...Array(6)].map((_, index) => (
@@ -143,7 +157,7 @@ function MobileStory() {
   }
 
   return (
-    <section className="md:hidden py-4 bg-gradient-to-r from-rose-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
+    <section className="md:hidden py-4 bg-gray-50 dark:bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {finalStories.map((story, index) => (
@@ -419,12 +433,12 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-rose-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-500">
       {/* Navbar */}
       {/* <Navbar /> */}
 
       {/* Live Rates Section - Desktop */}
-      <section className="hidden md:block bg-gradient-to-r from-amber-50 via-rose-50 to-amber-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
+      <section className="hidden md:block bg-gray-50 dark:bg-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <div className="flex justify-center">
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-rose-100 dark:bg-gray-800/90 dark:border-gray-700">
@@ -488,7 +502,7 @@ export default function HomePage() {
       </section>
 
       {/* Live Rates Section - Mobile */}
-      <section className="block md:hidden bg-gradient-to-r from-rose-100 to-amber-100 dark:from-gray-900 dark:to-gray-800 py-4">
+      <section className="block md:hidden bg-gray-50 dark:bg-gray-800 py-4">
         <div className="container mx-auto px-4">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg dark:bg-gray-800/90">
             <div className="flex items-center justify-between">
@@ -541,7 +555,7 @@ export default function HomePage() {
       <MobileStory />
 
       {/* Hero Slider Section - Tanishq Style with Proper Preview */}
-      <section className="py-6 bg-gradient-to-b from-amber-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
+      <section className="py-6 bg-white dark:bg-gray-900 overflow-hidden">
         <div className="container mx-auto px-4">
           {/* Desktop Hero Slider - Tanishq Style */}
           <div className="hidden md:block">
@@ -688,7 +702,7 @@ export default function HomePage() {
       </section>
 
       {/* Collections Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 px-6 py-2 rounded-full mb-6">
@@ -928,6 +942,271 @@ export default function HomePage() {
                   </div>
                 </Link>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 px-6 py-2 rounded-full mb-6">
+              <Shield className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm tracking-wider uppercase">
+                Why Choose Us
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-6 dark:text-gray-200">
+              Why{" "}
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 bg-clip-text text-transparent font-medium">
+                BALKRUSHNA JEWELLERS
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
+              75+ years of trust, quality craftsmanship, and exceptional service
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center group">
+              <div className="bg-gradient-to-br from-red-500 to-rose-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                <Award className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                Certified Quality
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                All our jewelry is hallmarked and certified for purity and
+                authenticity
+              </p>
+            </div>
+
+            <div className="text-center group">
+              <div className="bg-gradient-to-br from-amber-500 to-yellow-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                Expert Craftsmanship
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Skilled artisans with decades of experience in traditional and
+                modern designs
+              </p>
+            </div>
+
+            <div className="text-center group">
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                Lifetime Support
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Free cleaning, maintenance, and repair services for all our
+                jewelry
+              </p>
+            </div>
+
+            <div className="text-center group">
+              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-xl">
+                <Gem className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                Custom Designs
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Personalized jewelry designs tailored to your preferences and
+                occasions
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 px-6 py-2 rounded-full mb-6">
+              <Sparkles className="h-5 w-5 text-green-500" />
+              <span className="text-green-600 dark:text-green-400 font-semibold text-sm tracking-wider uppercase">
+                Our Services
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-6 dark:text-gray-200">
+              Complete{" "}
+              <span className="bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent font-medium">
+                Jewelry Solutions
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
+              From traditional gold schemes to modern digital gold investments
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-br from-amber-500 to-yellow-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <Crown className="h-7 w-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Gold Scheme
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+                Monthly gold saving scheme with attractive benefits and flexible
+                payment options
+              </p>
+              <Link href="/gold-scheme">
+                <Button className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white rounded-full px-6 py-2">
+                  Learn More
+                </Button>
+              </Link>
+            </div>
+
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <Sparkles className="h-7 w-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Digital Gold
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+                Invest in pure 24K gold digitally with secure storage and easy
+                redemption options
+              </p>
+              <Link href="/digital-gold">
+                <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-full px-6 py-2">
+                  Start Investing
+                </Button>
+              </Link>
+            </div>
+
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-br from-purple-500 to-pink-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <Gem className="h-7 w-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Custom Design
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+                Create unique, personalized jewelry pieces with our expert
+                design consultation
+              </p>
+              <Link href="/contact">
+                <Button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-full px-6 py-2">
+                  Get Quote
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 px-6 py-2 rounded-full mb-6">
+              <Heart className="h-5 w-5 text-rose-500" />
+              <span className="text-rose-600 dark:text-rose-400 font-semibold text-sm tracking-wider uppercase">
+                Customer Stories
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-6 dark:text-gray-200">
+              What Our{" "}
+              <span className="bg-gradient-to-r from-rose-600 via-pink-500 to-purple-500 bg-clip-text text-transparent font-medium">
+                Customers Say
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
+              Real experiences from our valued customers across Gujarat
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="flex items-center mb-6">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
+                "Excellent quality and service! I've been buying jewelry from
+                Balkrushna Jewellers for over 10 years. Their gold scheme helped
+                me save for my daughter's wedding."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                  P
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    Priya Patel
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Himatnagar
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="flex items-center mb-6">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
+                "The craftsmanship is outstanding! They created a custom
+                necklace for my wife's anniversary. The attention to detail and
+                quality is unmatched."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                  R
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    Rajesh Shah
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Ahmedabad
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="flex items-center mb-6">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
+                "Trusted family jeweller for three generations! Their hallmarked
+                gold and transparent pricing gives us complete confidence in
+                every purchase."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                  M
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    Meera Desai
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Gandhinagar
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
