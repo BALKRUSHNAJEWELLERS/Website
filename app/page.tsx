@@ -1,16 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Crown, Sparkles, Gem, ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Star,
-  Shield,
-  Award,
-  Users,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 
@@ -299,7 +291,7 @@ export default function HomePage() {
     {
       id: "default-1",
       image:
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Effortless Elegance, Every Day",
       subtitle: "Discover 7000+ Designs in 18KT, Made for Daily Moments",
       link: "/catalog",
@@ -307,7 +299,7 @@ export default function HomePage() {
     {
       id: "default-2",
       image:
-        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
+        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Timeless Gold Collection",
       subtitle: "Crafted with precision, designed for perfection",
       link: "/catalog/gold",
@@ -315,7 +307,7 @@ export default function HomePage() {
     {
       id: "default-3",
       image:
-        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Bridal Collection",
       subtitle: "Make your special day even more memorable",
       link: "/catalog/wedding",
@@ -323,7 +315,7 @@ export default function HomePage() {
     {
       id: "default-4",
       image:
-        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80",
+        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Festival Collection",
       subtitle: "Celebrate every moment with our festive jewelry",
       link: "/catalog/festival",
@@ -331,7 +323,7 @@ export default function HomePage() {
     {
       id: "default-5",
       image:
-        "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+        "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
       title: "Premium Ring Collection",
       subtitle: "Symbols of love and commitment",
       link: "/catalog/rings",
@@ -360,42 +352,76 @@ export default function HomePage() {
   const collections = [
     {
       id: "earrings",
-      title: "Stunning Every Ear",
+      title: "Stunning Earrings",
       subtitle: "Elegant earrings for every occasion",
-      image: "/placeholder.svg?height=400&width=600&text=Stunning+Earrings",
+      image:
+        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       link: "/catalog/earrings",
       size: "large",
+      price: "₹12,999",
+      discount: "25% OFF",
     },
     {
       id: "rings",
-      title: "The Ring Edit",
+      title: "Diamond Rings",
       subtitle: "Symbols of eternal love",
-      image: "/placeholder.svg?height=300&width=400&text=Beautiful+Rings",
+      image:
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       link: "/catalog/rings",
       size: "medium",
+      price: "₹25,999",
+      discount: "30% OFF",
     },
     {
       id: "chains",
-      title: "Daily Wear Chains",
+      title: "Gold Chains",
       subtitle: "Perfect for everyday elegance",
-      image: "/placeholder.svg?height=300&width=400&text=Gold+Chains",
+      image:
+        "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       link: "/catalog/chains",
       size: "medium",
+      price: "₹18,999",
+      discount: "20% OFF",
     },
     {
       id: "necklaces",
       title: "Statement Necklaces",
       subtitle: "Make a bold impression",
-      image: "/placeholder.svg?height=400&width=600&text=Statement+Necklaces",
+      image:
+        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       link: "/catalog/necklaces",
       size: "large",
+      price: "₹35,999",
+      discount: "35% OFF",
+    },
+    {
+      id: "bangles",
+      title: "Designer Bangles",
+      subtitle: "Traditional meets modern",
+      image:
+        "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      link: "/catalog/bangles",
+      size: "medium",
+      price: "₹22,999",
+      discount: "28% OFF",
+    },
+    {
+      id: "pendants",
+      title: "Elegant Pendants",
+      subtitle: "Delicate beauty for every day",
+      image:
+        "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      link: "/catalog/pendants",
+      size: "medium",
+      price: "₹15,999",
+      discount: "22% OFF",
     },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-rose-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
       {/* Navbar */}
-      
+      {/* <Navbar /> */}
 
       {/* Live Rates Section - Desktop */}
       <section className="hidden md:block bg-gradient-to-r from-amber-50 via-rose-50 to-amber-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
@@ -606,7 +632,7 @@ export default function HomePage() {
 
           {/* Mobile Hero Slider - Keep existing mobile implementation */}
           <div className="md:hidden">
-            <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl bg-white dark:bg-gray-800">
+            <div className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800 mx-2">
               {slidesToShow.map((item, index) => (
                 <div
                   key={item.id}
@@ -624,7 +650,22 @@ export default function HomePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:from-black/80" />
 
-                   
+                    <div className="absolute z-20 bottom-8 left-4 right-4 text-white text-center">
+                      <h1 className="text-2xl font-light leading-tight mb-2">
+                        {item.title}
+                      </h1>
+                      <p className="text-sm mb-4 opacity-90 font-light">
+                        {item.subtitle}
+                      </p>
+                      <Link href={item.link || "#"}>
+                        <Button
+                          size="sm"
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                        >
+                          Shop Now
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -647,309 +688,246 @@ export default function HomePage() {
       </section>
 
       {/* Collections Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-rose-50 dark:from-gray-800 dark:to-gray-900">
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
-              Balkrushna Collections
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 px-6 py-2 rounded-full mb-6">
+              <Sparkles className="h-5 w-5 text-red-500" />
+              <span className="text-red-600 dark:text-red-400 font-semibold text-sm tracking-wider uppercase">
+                Featured Collections
+              </span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-light text-gray-800 mb-6 dark:text-gray-200">
+              Discover Our
+              <span className="block bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 bg-clip-text text-transparent font-medium">
+                Exquisite Collections
+              </span>
             </h2>
-            <p className="text-lg text-gray-600 font-light dark:text-gray-400">
-              Explore our newly launched collection
+            <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
+              Each piece tells a story of craftsmanship, elegance, and timeless
+              beauty
             </p>
           </div>
 
-          {/* Desktop Collections Grid */}
-          <div className="hidden md:grid grid-cols-12 gap-6 max-w-7xl mx-auto">
-            {/* Large Collection Item 1 */}
-            <div className="col-span-8 row-span-2">
-              <Link href={collections[0].link} className="group block">
-                <div className="relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
-                  <img
-                    src={collections[0].image || "/placeholder.svg"}
-                    alt={collections[0].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-8 left-8 text-white">
-                    <h3 className="text-3xl font-light mb-2">
-                      {collections[0].title}
-                    </h3>
-                    <p className="text-lg opacity-90 font-light">
-                      {collections[0].subtitle}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            </div>
+          {/* Desktop Collections Grid - Advanced Layout */}
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-12 gap-8 max-w-7xl mx-auto">
+              {/* Large Featured Item */}
+              <div className="col-span-8 row-span-2">
+                <Link href={collections[0].link} className="group block">
+                  <div className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-700 transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
+                    <img
+                      src={collections[0].image || "/placeholder.svg"}
+                      alt={collections[0].title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-            {/* Medium Collection Item 1 */}
-            <div className="col-span-4">
-              <Link href={collections[1].link} className="group block">
-                <div className="relative h-44 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
-                  <img
-                    src={collections[1].image || "/placeholder.svg"}
-                    alt={collections[1].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-light mb-1">
-                      {collections[1].title}
-                    </h3>
-                    <p className="text-sm opacity-90 font-light">
-                      {collections[1].subtitle}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            </div>
+                    {/* Floating Discount Badge */}
+                    <div className="absolute top-6 right-6 bg-gradient-to-r from-red-500 to-rose-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                      {collections[0].discount}
+                    </div>
 
-            {/* Medium Collection Item 2 */}
-            <div className="col-span-4">
-              <Link href={collections[2].link} className="group block">
-                <div className="relative h-44 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
-                  <img
-                    src={collections[2].image || "/placeholder.svg"}
-                    alt={collections[2].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-light mb-1">
-                      {collections[2].title}
-                    </h3>
-                    <p className="text-sm opacity-90 font-light">
-                      {collections[2].subtitle}
-                    </p>
+                    {/* Content */}
+                    <div className="absolute bottom-8 left-8 right-8 text-white">
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-rose-200 mb-2 tracking-wider uppercase">
+                            Featured Collection
+                          </div>
+                          <h3 className="text-4xl font-light mb-3 leading-tight">
+                            {collections[0].title}
+                          </h3>
+                          <p className="text-lg opacity-90 font-light mb-4">
+                            {collections[0].subtitle}
+                          </p>
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl font-bold">
+                              {collections[0].price}
+                            </span>
+                            <Button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border border-white/30 rounded-full px-6 py-2 transition-all duration-300">
+                              Explore Now
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </div>
+                </Link>
+              </div>
 
-            {/* Large Collection Item 2 */}
-            <div className="col-span-12">
-              <Link href={collections[3].link} className="group block">
-                <div className="relative h-64 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02]">
-                  <img
-                    src={collections[3].image || "/placeholder.svg"}
-                    alt={collections[3].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-white">
-                    <h3 className="text-3xl font-light mb-2">
-                      {collections[3].title}
-                    </h3>
-                    <p className="text-lg opacity-90 font-light">
-                      {collections[3].subtitle}
-                    </p>
-                  </div>
+              {/* Medium Items */}
+              {collections.slice(1, 3).map((collection, index) => (
+                <div key={collection.id} className="col-span-4">
+                  <Link href={collection.link} className="group block">
+                    <div className="relative h-[285px] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] bg-white dark:bg-gray-800">
+                      <img
+                        src={collection.image || "/placeholder.svg"}
+                        alt={collection.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                      {/* Discount Badge */}
+                      <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-yellow-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        {collection.discount}
+                      </div>
+
+                      <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <h3 className="text-xl font-semibold mb-1">
+                          {collection.title}
+                        </h3>
+                        <p className="text-sm opacity-90 font-light mb-2">
+                          {collection.subtitle}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-bold">
+                            {collection.price}
+                          </span>
+                          <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                            <ChevronRight className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
+              ))}
+
+              {/* Bottom Row - Three Equal Items */}
+              {collections.slice(3, 6).map((collection, index) => (
+                <div key={collection.id} className="col-span-4">
+                  <Link href={collection.link} className="group block">
+                    <div className="relative h-[320px] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] bg-white dark:bg-gray-800">
+                      <img
+                        src={collection.image || "/placeholder.svg"}
+                        alt={collection.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                      {/* Discount Badge */}
+                      <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        {collection.discount}
+                      </div>
+
+                      <div className="absolute bottom-4 left-4 right-4 text-white">
+                        <h3 className="text-xl font-semibold mb-1">
+                          {collection.title}
+                        </h3>
+                        <p className="text-sm opacity-90 font-light mb-2">
+                          {collection.subtitle}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-bold">
+                            {collection.price}
+                          </span>
+                          <Button
+                            size="sm"
+                            className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-0 rounded-full px-4 py-1 text-xs"
+                          >
+                            View
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tablet Collections Grid */}
+          <div className="hidden md:block lg:hidden">
+            <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {collections.map((collection, index) => (
+                <Link
+                  key={collection.id}
+                  href={collection.link}
+                  className="group block"
+                >
+                  <div className="relative h-80 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] bg-white dark:bg-gray-800">
+                    <img
+                      src={collection.image || "/placeholder.svg"}
+                      alt={collection.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                    {/* Discount Badge */}
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-rose-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      {collection.discount}
+                    </div>
+
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h3 className="text-2xl font-semibold mb-2">
+                        {collection.title}
+                      </h3>
+                      <p className="text-sm opacity-90 font-light mb-3">
+                        {collection.subtitle}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold">
+                          {collection.price}
+                        </span>
+                        <Button
+                          size="sm"
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-0 rounded-full px-4 py-2"
+                        >
+                          Explore
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
 
           {/* Mobile Collections Grid */}
-          <div className="md:hidden space-y-6">
-            {collections.map((collection, index) => (
-              <Link
-                key={collection.id}
-                href={collection.link}
-                className="group block"
-              >
-                <div className="relative h-48 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-                  <img
-                    src={collection.image || "/placeholder.svg"}
-                    alt={collection.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-light mb-1">
-                      {collection.title}
-                    </h3>
-                    <p className="text-sm opacity-90 font-light">
-                      {collection.subtitle}
-                    </p>
+          <div className="block md:hidden">
+            <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
+              {collections.map((collection, index) => (
+                <Link
+                  key={collection.id}
+                  href={collection.link}
+                  className="group block"
+                >
+                  <div className="relative h-[400px] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] bg-white dark:bg-gray-800">
+                    <img
+                      src={collection.image || "/placeholder.svg"}
+                      alt={collection.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                    {/* Discount Badge */}
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-rose-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      {collection.discount}
+                    </div>
+
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h3 className="text-xl font-semibold mb-2">
+                        {collection.title}
+                      </h3>
+                      <p className="text-sm opacity-90 font-light mb-3">
+                        {collection.subtitle}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold">
+                          {collection.price}
+                        </span>
+                        <Button
+                          size="sm"
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-0 rounded-full px-4 py-2"
+                        >
+                          Explore
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
-              Our Services
-            </h2>
-            <p className="text-lg text-gray-600 font-light max-w-2xl mx-auto dark:text-gray-400">
-              Discover our comprehensive range of jewelry services designed for
-              you
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                title: "Gold Scheme",
-                description:
-                  "Join our flexible gold savings scheme and secure your future with gold investments",
-                icon: <Crown className="h-8 w-8" />,
-                color: "from-amber-500 to-yellow-600",
-                link: "/gold-scheme",
-              },
-              {
-                title: "Digital Gold",
-                description:
-                  "Buy, sell, and store gold digitally with complete security and transparency",
-                icon: <Sparkles className="h-8 w-8" />,
-                color: "from-red-500 to-pink-600",
-                link: "/digital-gold",
-              },
-              {
-                title: "Ring Measurement",
-                description:
-                  "Find your perfect ring size with our accurate measurement tools",
-                icon: <Gem className="h-8 w-8" />,
-                color: "from-purple-500 to-indigo-600",
-                link: "/ring-measurement",
-              },
-            ].map((service, index) => (
-              <Card
-                key={index}
-                className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-gray-50 overflow-hidden dark:from-gray-800 dark:to-gray-700 rounded-3xl"
-              >
-                <CardContent className="p-8 text-center">
-                  <div
-                    className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.color} text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
-                  >
-                    {service.icon}
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed dark:text-gray-400">
-                    {service.description}
-                  </p>
-                  <Link href={service.link}>
-                    <Button
-                      className={`bg-gradient-to-r ${service.color} text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-300`}
-                    >
-                      Learn More
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-rose-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-4">
-              <Crown className="h-12 w-12 text-red-500 dark:text-amber-500" />
-            </div>
-            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-4 dark:text-gray-200">
-              Why Choose{" "}
-              <span className="bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent font-medium">
-                BALKRUSHNA JEWELLERS
-              </span>
-            </h2>
-            <p className="text-lg text-gray-600 font-light max-w-3xl mx-auto dark:text-gray-400">
-              Experience the finest in jewelry craftsmanship with our commitment
-              to quality and excellence
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <Shield className="h-8 w-8" />,
-                title: "Certified Quality",
-                description:
-                  "All our jewelry comes with proper certification and quality assurance",
-                gradient: "from-blue-500 to-cyan-500",
-              },
-              {
-                icon: <Award className="h-8 w-8" />,
-                title: "25+ Years Experience",
-                description:
-                  "Trusted by generations with decades of craftsmanship excellence",
-                gradient: "from-purple-500 to-fuchsia-500",
-              },
-              {
-                icon: <Users className="h-8 w-8" />,
-                title: "Customer First",
-                description:
-                  "Dedicated customer service and lifetime maintenance support",
-                gradient: "from-green-500 to-teal-500",
-              },
-              {
-                icon: <Star className="h-8 w-8" />,
-                title: "Premium Designs",
-                description: "Exclusive designs crafted by master artisans",
-                gradient: "from-red-500 to-rose-500",
-              },
-            ].map((feature, index) => (
-              <Card
-                key={index}
-                className="group hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-3xl"
-              >
-                <CardContent className="p-6 text-center">
-                  <div
-                    className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${feature.gradient} text-white mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
-                  >
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-200">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed dark:text-gray-400">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-16 relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://png.pngtree.com/thumb_back/fh260/background/20240929/pngtree-beautiful-diamond-engagement-ring-on-a-dark-sparkling-background-the-focus-image_16280948.jpg')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50" />
-
-        <div className="relative container mx-auto px-4 text-center text-white">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-light mb-4">
-              Stay Updated
-            </h2>
-            <p className="text-lg md:text-xl mb-8 opacity-90 font-light">
-              Get the latest updates on new collections and exclusive offers
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-6 py-3 rounded-full text-gray-900 bg-white/95 backdrop-blur-sm border-0 focus:ring-2 focus:ring-red-500 focus:outline-none"
-              />
-              <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                Subscribe
-              </Button>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
