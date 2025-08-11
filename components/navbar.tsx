@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -22,6 +23,7 @@ import { useTheme } from "next-themes";
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
@@ -40,6 +42,13 @@ export function Navbar() {
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
+
+  const isActiveRoute = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg shadow-sm">
@@ -66,16 +75,29 @@ export function Navbar() {
 
           {/* Desktop Navigation - Subtle & Professional */}
           <div className="hidden lg:flex items-center space-x-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-slate-800 group"
-              >
-                {item.name}
-                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-amber-600 dark:bg-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = isActiveRoute(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 group ${
+                    isActive
+                      ? "text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20"
+                      : "text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {item.name}
+                  <span
+                    className={`absolute bottom-0 left-0 w-full h-[2px] bg-amber-600 dark:bg-amber-500 transform transition-transform duration-300 origin-left ${
+                      isActive
+                        ? "scale-x-100"
+                        : "scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  ></span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right-aligned Icons */}
@@ -94,7 +116,7 @@ export function Navbar() {
 
             {/* Call Now Button - High Contrast */}
             <Link href="tel:+917600093017" className="hidden md:block">
-              <Button className="bg-yellow-400 hover:bg-white-500 dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-slate-900 text-white font-semibold px-5 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+              <Button className="bg-yellow-400 hover:bg-yellow-500 dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-slate-900 text-slate-900 font-semibold px-5 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                 <Phone className="h-4 w-4 mr-2" />
                 Call Now
               </Button>
@@ -143,14 +165,25 @@ export function Navbar() {
                 <div className="flex flex-col gap-2 flex-grow">
                   {navItems.map((item) => {
                     const Icon = item.icon;
+                    const isActive = isActiveRoute(item.href);
                     return (
                       <Link
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-slate-800/60 transition-all duration-200 text-slate-200 text-base font-medium group"
+                        className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 text-base font-medium group ${
+                          isActive
+                            ? "bg-amber-500/20 text-amber-400 border-l-4 border-amber-500"
+                            : "hover:bg-slate-800/60 text-slate-200"
+                        }`}
                       >
-                        <Icon className="w-5 h-5 text-amber-500/80 group-hover:text-amber-500 transition-colors duration-200" />
+                        <Icon
+                          className={`w-5 h-5 transition-colors duration-200 ${
+                            isActive
+                              ? "text-amber-500"
+                              : "text-amber-500/80 group-hover:text-amber-500"
+                          }`}
+                        />
                         <span>{item.name}</span>
                       </Link>
                     );

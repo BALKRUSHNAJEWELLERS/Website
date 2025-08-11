@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -25,6 +24,7 @@ const fadeInUp = {
     transition: { duration: 0.8, ease: "easeOut" as const },
   },
 };
+
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: {
@@ -172,7 +172,6 @@ export default function DigitalGoldPage() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1611591437281-4608be122683?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center">
           <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A]/80 via-[#D4AF37]/30 to-[#1A1A1A]/80"></div>
         </div>
-
         <div className="relative container mx-auto px-4 max-w-7xl">
           <motion.div
             className="max-w-4xl mx-auto text-center"
@@ -185,7 +184,6 @@ export default function DigitalGoldPage() {
               <span style={goldText}>Invest in Digital Gold</span> <br />
               <span className="text-white">with Balkrushna Jewellery</span>
             </motion.h1>
-
             <motion.p
               className="text-xl md:text-2xl mb-8 text-white/90"
               variants={fadeInUp}
@@ -194,7 +192,6 @@ export default function DigitalGoldPage() {
               The modern, secure way to own 24K pure gold with the trust of
               generations
             </motion.p>
-
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
               variants={fadeInUp}
@@ -239,7 +236,6 @@ export default function DigitalGoldPage() {
               className="w-full h-auto object-contain"
             />
           </motion.div>
-
           <motion.div variants={fadeInUp}>
             <div className="flex items-center mb-4">
               <Coins className="h-8 w-8 text-[#D4AF37] mr-3" />
@@ -247,7 +243,6 @@ export default function DigitalGoldPage() {
                 Digital Gold Investment
               </h2>
             </div>
-
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
               At{" "}
               <span className="font-semibold text-[#D4AF37]">
@@ -257,7 +252,6 @@ export default function DigitalGoldPage() {
               combines the timeless value of gold with modern convenience and
               security.
             </p>
-
             <ul className="space-y-3">
               {[
                 "24K pure gold stored in secure vaults",
@@ -300,7 +294,6 @@ export default function DigitalGoldPage() {
               security and convenience.
             </p>
           </motion.div>
-
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
             variants={{
@@ -365,7 +358,6 @@ export default function DigitalGoldPage() {
               Balkrushna.
             </p>
           </motion.div>
-
           <div className="flex flex-col lg:flex-row gap-12">
             <motion.div className="w-full lg:w-1/2" variants={fadeInUp}>
               <div className="flex w-full border border-gray-200 dark:border-[#333333] rounded-lg overflow-hidden mb-8">
@@ -386,20 +378,17 @@ export default function DigitalGoldPage() {
                   </button>
                 ))}
               </div>
-
               <div className="space-y-4">
                 {faqData[activeFaqTab].map((faq, index) => (
                   <motion.div
                     key={index}
                     className={`rounded-xl overflow-hidden transition-all duration-300 ${
                       openFAQIndex === index
-                        ? "bg-[#F8F5F0] dark:bg-[#333333] shadow-lg"
-                        : "bg-gray-50 dark:bg-[#252525] shadow-md hover:shadow-lg"
+                        ? "bg-[#F8F5F0] dark:bg-[#1A1A1A] shadow-lg"
+                        : "bg-gray-50 dark:bg-[#1A1A1A] shadow-md hover:shadow-lg"
                     }`}
                     initial={false}
                     animate={{
-                      backgroundColor:
-                        openFAQIndex === index ? "#F8F5F0" : "#F5F5F5",
                       borderColor:
                         openFAQIndex === index ? "#D4AF37" : "transparent",
                     }}
@@ -423,7 +412,6 @@ export default function DigitalGoldPage() {
                         )}
                       </span>
                     </button>
-
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{
@@ -441,7 +429,6 @@ export default function DigitalGoldPage() {
                 ))}
               </div>
             </motion.div>
-
             <motion.div
               className="hidden lg:flex w-full lg:w-1/2 justify-center items-center p-8 rounded-2xl bg-gradient-to-br from-[#F8F5F0] to-[#D4AF37]/20 dark:from-[#333333] dark:to-[#996515]/30 shadow-xl hover:shadow-2xl transition-all duration-500"
               variants={fadeInUp}
@@ -483,7 +470,6 @@ export default function DigitalGoldPage() {
               Have questions? Our gold investment specialists are here to help.
             </p>
           </motion.div>
-
           <motion.form
             onSubmit={handleWhatsAppInquiry}
             className="bg-white dark:bg-[#252525] rounded-xl shadow-xl p-8 md:p-10 space-y-6"
@@ -506,7 +492,6 @@ export default function DigitalGoldPage() {
                 required
               />
             </div>
-
             <div>
               <label
                 htmlFor="email"
@@ -523,7 +508,6 @@ export default function DigitalGoldPage() {
                 required
               />
             </div>
-
             <div>
               <label
                 htmlFor="message"
@@ -540,7 +524,6 @@ export default function DigitalGoldPage() {
                 required
               ></textarea>
             </div>
-
             <button
               type="submit"
               className="w-full bg-[#D4AF37] hover:bg-[#C0A080] text-white py-4 px-6 rounded-full text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
@@ -574,14 +557,12 @@ export default function DigitalGoldPage() {
             <Award className="h-6 w-6 text-white mr-2" />
             <span className="font-medium">TRUSTED BY THOUSANDS</span>
           </motion.div>
-
           <motion.h2
             className="text-3xl md:text-5xl font-bold mb-6 leading-tight"
             variants={fadeInUp}
           >
             Secure Your Future with <br /> Digital Gold Today
           </motion.h2>
-
           <motion.p
             className="text-xl mb-8 opacity-90 max-w-2xl mx-auto"
             variants={fadeInUp}
@@ -590,7 +571,6 @@ export default function DigitalGoldPage() {
             Join the smart investors who trust Balkrushna Jewellery for their
             gold investments.
           </motion.p>
-
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center"
             variants={fadeInUp}
