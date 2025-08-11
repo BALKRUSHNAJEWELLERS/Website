@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 
 interface MetalRate {
@@ -93,6 +94,92 @@ const staticStoryItems: StoryItem[] = [
     title: "Rings",
     link: "/catalog/rings",
     subtitle: "Symbols of eternal love",
+  },
+];
+// --- Services Data for Complete Jewelry Solutions ---
+const services = [
+  {
+    icon: <Crown className="h-7 w-7 text-white" />,
+    title: "Gold Scheme",
+    desc: "Monthly gold saving scheme with attractive benefits and flexible payment options",
+    link: "/gold-scheme",
+    btn: "Learn More",
+    btnClasses:
+      "bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white rounded-full px-6 py-2",
+  },
+  {
+    icon: <Sparkles className="h-7 w-7 text-white" />,
+    title: "Digital Gold",
+    desc: "Invest in pure 24K gold digitally with secure storage and easy redemption options",
+    link: "/digital-gold",
+    btn: "Start Investing",
+    btnClasses:
+      "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-full px-6 py-2",
+  },
+  {
+    icon: <Gem className="h-7 w-7 text-white" />,
+    title: "Custom Design",
+    desc: "Create unique, personalized jewelry pieces with our expert design consultation",
+    link: "/contact",
+    btn: "Get Quote",
+    btnClasses:
+      "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-full px-6 py-2",
+  },
+];
+
+// --- Features Data for Why Balkrushna Jewellers ---
+const features = [
+  {
+    id: "certified-quality",
+    icon: <Award className="h-8 w-8 text-white" />,
+    title: "Certified Quality",
+    desc: "All our jewelry is hallmarked and certified for purity and authenticity",
+  },
+  {
+    id: "expert-craftsmanship",
+    icon: <Users className="h-8 w-8 text-white" />,
+    title: "Expert Craftsmanship",
+    desc: "Skilled artisans with decades of experience in traditional and modern designs",
+  },
+  {
+    id: "lifetime-support",
+    icon: <Shield className="h-8 w-8 text-white" />,
+    title: "Lifetime Support",
+    desc: "Free cleaning, maintenance, and repair services for all our jewelry",
+  },
+  {
+    id: "custom-designs",
+    icon: <Gem className="h-8 w-8 text-white" />,
+    title: "Custom Designs",
+    desc: "Personalized jewelry designs tailored to your preferences and occasions",
+  },
+];
+
+// --- Testimonials Data ---
+const testimonials = [
+  {
+    id: "priya",
+    name: "Priya Patel",
+    place: "Himatnagar",
+    text: "Excellent quality and service! I've been buying jewelry from Balkrushna Jewellers for over 10 years. Their gold scheme helped me save for my daughter's wedding.",
+    avatarClass: "from-rose-400 to-pink-500",
+    initial: "P",
+  },
+  {
+    id: "rajesh",
+    name: "Rajesh Shah",
+    place: "Ahmedabad",
+    text: "The craftsmanship is outstanding! They created a custom necklace for my wife's anniversary. The attention to detail and quality is unmatched.",
+    avatarClass: "from-blue-400 to-indigo-500",
+    initial: "R",
+  },
+  {
+    id: "meera",
+    name: "Meera Desai",
+    place: "Gandhinagar",
+    text: "Trusted family jeweller for three generations! Their hallmarked gold and transparent pricing gives us complete confidence in every purchase.",
+    avatarClass: "from-green-400 to-emerald-500",
+    initial: "M",
   },
 ];
 
@@ -431,6 +518,42 @@ export default function HomePage() {
       discount: "22% OFF",
     },
   ];
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  const pulseVariants = {
+    initial: { scale: 1 },
+    pulse: {
+      scale: [1, 1.1, 1],
+      transition: {
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut" as const
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-500">
@@ -438,68 +561,113 @@ export default function HomePage() {
       {/* <Navbar /> */}
 
       {/* Live Rates Section - Desktop */}
-      <section className="hidden md:block bg-gray-50 dark:bg-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-rose-100 dark:bg-gray-800/90 dark:border-gray-700">
+     <section className="hidden md:block bg-gray-50 dark:bg-gray-800 py-4 border-b border-rose-100 dark:border-gray-700">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-center">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-rose-100 dark:bg-gray-800/90 dark:border-gray-700"
+          >
+            <div className="flex items-center gap-6">
+              <motion.div 
+                variants={itemVariants}
+                className="flex items-center gap-2"
+              >
+                <motion.div
+                  variants={pulseVariants}
+                  initial="initial"
+                  animate="pulse"
+                  className="w-2.5 h-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full shadow-lg"
+                ></motion.div>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Live Rates
+                </span>
+              </motion.div>
+
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full animate-pulse shadow-lg"></div>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Live Rates
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
-                        Gold (24K)
-                      </div>
-                      <div className="text-lg font-bold text-amber-600">
-                        ₹{rates.gold}
-                      </div>
+                <motion.div 
+                  variants={itemVariants}
+                  className="flex items-center gap-2"
+                >
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
+                      Gold (24K)
                     </div>
-                    {rates.previousGold !== undefined &&
-                      rates.gold !== rates.previousGold &&
-                      (rates.gold > rates.previousGold ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
-                      ))}
+                    <motion.div 
+                      key={`gold-${rates.gold}`}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-lg font-bold text-amber-600"
+                    >
+                      ₹{rates.gold}<span className="text-sm font-normal">/10gm</span>
+                    </motion.div>
                   </div>
+                  {rates.previousGold !== undefined &&
+                    rates.gold !== rates.previousGold &&
+                    (rates.gold > rates.previousGold ? (
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-red-500" />
+                    ))}
+                </motion.div>
 
-                  <div className="w-px h-8 bg-gray-200 dark:bg-gray-700"></div>
+                <motion.div 
+                  variants={itemVariants}
+                  className="w-px h-8 bg-gray-200 dark:bg-gray-700"
+                ></motion.div>
 
-                  <div className="flex items-center gap-2">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
-                        Silver
-                      </div>
-                      <div className="text-lg font-bold text-gray-600 dark:text-gray-400">
-                        ₹{rates.silver}
-                      </div>
+                <motion.div 
+                  variants={itemVariants}
+                  className="flex items-center gap-2"
+                >
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 font-medium dark:text-gray-400">
+                      Silver
                     </div>
-                    {rates.previousSilver !== undefined &&
-                      rates.silver !== rates.previousSilver &&
-                      (rates.silver > rates.previousSilver ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
-                      ))}
+                    <motion.div 
+                      key={`silver-${rates.silver}`}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-lg font-bold text-neutral-400 dark:text-gray-400"
+                    >
+                      ₹{rates.silver}<span className="text-sm font-normal">/1kg</span>
+                    </motion.div>
                   </div>
-                </div>
-
-                {hasMounted && (
-                  <div className="text-xs text-gray-400 dark:text-gray-500">
-                    Updated: {new Date(rates.lastUpdated).toLocaleTimeString()}
-                  </div>
-                )}
+                  {rates.previousSilver !== undefined &&
+                    rates.silver !== rates.previousSilver &&
+                    (rates.silver > rates.previousSilver ? (
+                      <TrendingUp className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-red-500" />
+                    ))}
+                </motion.div>
               </div>
+
+              {hasMounted && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="text-xs text-gray-400 dark:text-gray-500"
+                >
+                  Updated: {new Date(rates.lastUpdated).toLocaleString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </motion.div>
+              )}
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </div>
+    </section>
+
 
       {/* Live Rates Section - Mobile */}
       <section className="block md:hidden bg-gray-50 dark:bg-gray-800 py-4">
@@ -1027,7 +1195,13 @@ export default function HomePage() {
       {/* Services Section */}
       <section className="py-20 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 px-6 py-2 rounded-full mb-6">
               <Sparkles className="h-5 w-5 text-green-500" />
               <span className="text-green-600 dark:text-green-400 font-semibold text-sm tracking-wider uppercase">
@@ -1043,70 +1217,135 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
               From traditional gold schemes to modern digital gold investments
             </p>
-          </div>
-
+          </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-amber-500 to-yellow-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Crown className="h-7 w-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Gold Scheme
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-                Monthly gold saving scheme with attractive benefits and flexible
-                payment options
-              </p>
-              <Link href="/gold-scheme">
-                <Button className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white rounded-full px-6 py-2">
-                  Learn More
-                </Button>
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Sparkles className="h-7 w-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Digital Gold
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-                Invest in pure 24K gold digitally with secure storage and easy
-                redemption options
-              </p>
-              <Link href="/digital-gold">
-                <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-full px-6 py-2">
-                  Start Investing
-                </Button>
-              </Link>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <Gem className="h-7 w-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Custom Design
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-                Create unique, personalized jewelry pieces with our expert
-                design consultation
-              </p>
-              <Link href="/contact">
-                <Button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-full px-6 py-2">
-                  Get Quote
-                </Button>
-              </Link>
-            </div>
+            {services.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.12 * index }}
+                viewport={{ once: true }}
+                whileHover={{
+                  scale: 1.035,
+                  boxShadow: "0 12px 32px rgba(16,128,64,0.11)",
+                }}
+                className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+              >
+                <div
+                  className={`bg-gradient-to-br w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg
+                  ${
+                    index === 0
+                      ? "from-amber-500 to-yellow-600"
+                      : index === 1
+                      ? "from-blue-500 to-indigo-600"
+                      : "from-purple-500 to-pink-600"
+                  }`}
+                >
+                  {item.icon}
+                </div>
+                <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+                  {item.desc}
+                </p>
+                <Link href={item.link}>
+                  <Button className={item.btnClasses}>{item.btn}</Button>
+                </Link>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* --- Why BALKRUSHNA JEWELLERS Section (ENHANCED) --- */}
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 px-6 py-2 rounded-full mb-6">
+              <Shield className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm tracking-wider uppercase">
+                Why Choose Us
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-light text-gray-800 mb-6 dark:text-gray-200">
+              Why{" "}
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 bg-clip-text text-transparent font-medium">
+                BALKRUSHNA JEWELLERS
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
+              75+ years of trust, quality craftsmanship, and exceptional service
+            </p>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{
+              hidden: {},
+              show: {
+                transition: { staggerChildren: 0.15 },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.id}
+                initial={{ opacity: 0, scale: 0.92, y: 30 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.16 * index }}
+                whileHover={{
+                  scale: 1.04,
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.11)",
+                }}
+                className="text-center group"
+                viewport={{ once: true }}
+              >
+                <div
+                  className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl
+                  ${
+                    index === 0
+                      ? "bg-gradient-to-br from-red-500 to-rose-600"
+                      : index === 1
+                      ? "bg-gradient-to-br from-amber-500 to-yellow-600"
+                      : index === 2
+                      ? "bg-gradient-to-br from-green-500 to-emerald-600"
+                      : "bg-gradient-to-br from-purple-500 to-indigo-600"
+                  }`}
+                >
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {feature.desc}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* --- What Our Customers Say Section --- */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 px-6 py-2 rounded-full mb-6">
               <Heart className="h-5 w-5 text-rose-500" />
               <span className="text-rose-600 dark:text-rose-400 font-semibold text-sm tracking-wider uppercase">
@@ -1122,95 +1361,53 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed dark:text-gray-400">
               Real experiences from our valued customers across Gujarat
             </p>
-          </div>
-
+          </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
-              <div className="flex items-center mb-6">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
-                "Excellent quality and service! I've been buying jewelry from
-                Balkrushna Jewellers for over 10 years. Their gold scheme helped
-                me save for my daughter's wedding."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
-                  P
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    Priya Patel
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Himatnagar
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.id}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.12 * index }}
+                viewport={{ once: true }}
+                whileHover={{
+                  scale: 1.03,
+                  boxShadow: "0 12px 32px rgba(240,10,80,0.09)",
+                }}
+                className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500"
+              >
+                <div className="flex items-center mb-6">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-current" />
+                    ))}
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
-              <div className="flex items-center mb-6">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
-                "The craftsmanship is outstanding! They created a custom
-                necklace for my wife's anniversary. The attention to detail and
-                quality is unmatched."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
-                  R
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    Rajesh Shah
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
+                  "{testimonial.text}"
+                </p>
+                <div className="flex items-center">
+                  <div
+                    className={`w-12 h-12 bg-gradient-to-br ${testimonial.avatarClass} rounded-full flex items-center justify-center text-white font-semibold mr-4`}
+                  >
+                    {testimonial.initial}
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Ahmedabad
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white">
+                      {testimonial.name}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {testimonial.place}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
-              <div className="flex items-center mb-6">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
-                "Trusted family jeweller for three generations! Their hallmarked
-                gold and transparent pricing gives us complete confidence in
-                every purchase."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold mr-4">
-                  M
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    Meera Desai
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Gandhinagar
-                  </div>
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
     </div>
   );
 }
+
+

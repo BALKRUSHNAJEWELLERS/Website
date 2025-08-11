@@ -125,7 +125,8 @@ export function ChatBot() {
     if (
       lower.includes("timing") ||
       lower.includes("hours") ||
-      lower.includes("open")
+      lower.includes("open") ||
+      lower.includes("time")
     ) {
       return {
         text: `Our store hours are **10:00 AM to 8:00 PM, Monday to Saturday**. Closed on Sundays.`,
