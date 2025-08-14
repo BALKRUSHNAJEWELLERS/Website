@@ -1,16 +1,19 @@
-"use client"; // This directive is crucial for client-side hooks like useEffect, useRef, useState
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Ruler, Hand, Scan } from "lucide-react"; // Scan icon for ring measurement
+import { Ruler, Hand, Scan, Info, ArrowRight, Circle, Coins, CreditCard } from "lucide-react";
 
-// Data from the provided Tanishq Ring Size Chart (Page 4 of PDF)
-// Renamed to be generic for Balkrushna
-const balkrushnaSizeChart = [
+interface RingSize {
+  indian: string;
+  circumference: number;
+  diameter: number;
+}
+
+const balkrushnaSizeChart: RingSize[] = [
   { indian: "1", circumference: 41.01, diameter: 13.10 },
   { indian: "2", circumference: 42.70, diameter: 13.30 },
   { indian: "3", circumference: 42.90, diameter: 13.70 },
@@ -41,407 +44,699 @@ const balkrushnaSizeChart = [
   { indian: "28", circumference: 67.80, diameter: 21.60 },
   { indian: "29", circumference: 69.10, diameter: 22.00 },
   { indian: "30", circumference: 71.00, diameter: 22.30 },
-];
-
-// Data from Couple Ring Size Calculator (Page 5 of PDF)
-const menRingSizes = {
-  R: 18.80,
-  S: 19.10,
-  T: 19.50,
-};
-
-const womenRingSizes = {
-  L: 16.40,
-  M: 16.80,
-  N: 17.20,
-};
-
-const coupleSizeCodes = [
-  { code: 1, individual: "M+R" },
-  { code: 2, individual: "M+S" },
-  { code: 3, individual: "M+T" },
-  { code: 4, individual: "L+R" },
-  { code: 5, individual: "L+S" },
-  { code: 6, individual: "L+T" },
-  { code: 7, individual: "N+R" },
-  { code: 8, individual: "N+S" },
-  { code: 9, individual: "N+T" },
+  { indian: "31", circumference: 72.50, diameter: 23.00 },
+  { indian: "32", circumference: 74.00, diameter: 23.50 },
+  { indian: "33", circumference: 75.50, diameter: 24.00 },
+  { indian: "34", circumference: 77.00, diameter: 24.50 },
+  { indian: "35", circumference: 78.50, diameter: 25.00 },
+  { indian: "36", circumference: 80.00, diameter: 25.50 },
+  { indian: "37", circumference: 81.50, diameter: 26.00 },
+  { indian: "38", circumference: 83.00, diameter: 26.50 },
+  { indian: "39", circumference: 84.50, diameter: 27.00 },
+  { indian: "40", circumference: 86.00, diameter: 27.50 },
+  { indian: "41", circumference: 87.50, diameter: 28.00 },
+  { indian: "42", circumference: 89.00, diameter: 28.50 },
+  { indian: "43", circumference: 90.50, diameter: 29.00 },
+  { indian: "44", circumference: 92.00, diameter: 29.50 },
+  { indian: "45", circumference: 93.50, diameter: 30.00 },
+  { indian: "46", circumference: 95.00, diameter: 30.50 },
+  { indian: "47", circumference: 96.50, diameter: 31.00 },
+  { indian: "48", circumference: 98.00, diameter: 31.50 },
+  { indian: "49", circumference: 99.50, diameter: 32.00 },
+  { indian: "50", circumference: 101.00, diameter: 32.50 },
 ];
 
 export default function BalkrushnaRingMeasurementPage() {
   const [fingerCircumference, setFingerCircumference] = useState("");
   const [ringDiameter, setRingDiameter] = useState("");
-  const [measuredSize, setMeasuredSize] = useState<{ indian: string; circumference: number; diameter: number } | null>(null);
-  const [dpi, setDpi] = useState(96); // Default DPI, will be measured on mount
+  const [measuredSize, setMeasuredSize] = useState<RingSize | null>(null);
+
+  // ===== Calibration / unit conversion =====
+  const [dpi, setDpi] = useState(96); // css px/in
+  const [calibrationFactor, setCalibrationFactor] = useState(1); // multiplies css->device px to match true mm
+
+  // Finger on-screen measurement state
+  const [fingerWidthPx, setFingerWidthPx] = useState(100); // controlled by the new finger adjuster (horizontal only)
+
+  // Ring-on-screen measurement state (kept from your original Ring tab)
+  const [ringDiameterPx, setRingDiameterPx] = useState(94);
+
+  const [activeTab, setActiveTab] = useState("finger");
+  const [showHelp, setShowHelp] = useState(false);
+  const [showCalibration, setShowCalibration] = useState(false);
+  const [isAdjusting, setIsAdjusting] = useState(false);
+
+  // New: dedicated credit-card calibration modal for finger flow
+  const [showCardCalib, setShowCardCalib] = useState(false);
+  const [cardWidthPx, setCardWidthPx] = useState(320); // resizable outline width (keeps 85.60:53.98 ratio)
+
   const fingerRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const [fingerWidthPx, setFingerWidthPx] = useState(160); // Initial pixel width for finger visual
-  const [fingerHeightPx, setFingerHeightPx] = useState(60); // Initial pixel height for finger visual
-  const [ringDiameterPx, setRingDiameterPx] = useState(112); // Initial pixel diameter for ring visual
 
+  // --- Utils: px <-> mm with calibration ---
+  const pixelsToMm = (pixels: number) => (pixels * 25.4 * calibrationFactor) / dpi;
+  const mmToPixels = (mm: number) => (mm * dpi) / (25.4 * calibrationFactor);
+
+  // Prevent vertical scroll while measuring (mobile friendly)
   useEffect(() => {
-    // Dynamically measure DPI (Dots Per Inch) of the screen
-    // This helps in converting pixel measurements to real-world millimeters.
-    const div = document.createElement("div");
-    div.style.width = "1in"; // Create a div with a fixed width of 1 inch
-    div.style.visibility = "hidden"; // Make it invisible
-    document.body.appendChild(div);
-    setDpi(div.offsetWidth); // Get the width in pixels, which represents the DPI
-    document.body.removeChild(div); // Clean up the temporary div
+    const elFinger = fingerRef.current;
+    const elRing = ringRef.current;
+    if (elFinger) elFinger.style.touchAction = "none";
+    if (elRing) elRing.style.touchAction = "none";
+
+    const onTouchMove = (e: TouchEvent) => {
+      const targetInFinger = elFinger?.contains(e.target as Node);
+      const targetInRing = elRing?.contains(e.target as Node);
+      if (targetInFinger || targetInRing) e.preventDefault();
+    };
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => document.removeEventListener("touchmove", onTouchMove);
   }, []);
 
-  // Handler for calculating finger circumference based on screen measurement (pixels to mm)
+  // Lock body scroll while actively adjusting
+  useEffect(() => {
+    if (isAdjusting) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [isAdjusting]);
+
+  // Measure DPI + account for devicePixelRatio for better baseline
+  useEffect(() => {
+    const div = document.createElement("div");
+    div.style.width = "1in";
+    div.style.position = "absolute";
+    div.style.visibility = "hidden";
+    document.body.appendChild(div);
+    const cssInPx = div.offsetWidth; // CSS pixels per inch
+    document.body.removeChild(div);
+    setDpi(cssInPx * (window.devicePixelRatio || 1));
+  }, []);
+
+  // --- Calibration: 2 rupee coin (kept for Ring tab) or manual ---
+  const calibrateWithCoin = () => {
+    const actualDiameterMm = 25; // 2 rupee coin
+    const measuredDiameterMm = (ringDiameterPx * 25.4 * calibrationFactor) / dpi;
+    if (measuredDiameterMm > 0) {
+      const newCalibrationFactor = actualDiameterMm / measuredDiameterMm;
+      setCalibrationFactor(newCalibrationFactor);
+    }
+    setShowCalibration(false);
+  };
+
+  // --- NEW: Credit card calibration (for Finger tab) ---
+  const confirmCardCalibration = () => {
+    const CARD_MM = 85.60; // ISO/IEC 7810 ID-1 width in mm
+    // ensure our conversion makes pixelsToMm(cardWidthPx) === CARD_MM
+    const newCal = (CARD_MM * dpi) / (25.4 * cardWidthPx);
+    setCalibrationFactor(newCal);
+    setShowCardCalib(false);
+  };
+
+  // --- Measuring actions ---
   const handleFingerScreenMeasure = () => {
-    // For finger, we'll use the average of width and height for a more robust circumference estimation
-    // This is a simplification, as true finger circumference isn't a simple average of width/height
-    // but it provides a visual adjustment.
-    const avgPx = (fingerWidthPx + fingerHeightPx) / 2;
-    const mm = (avgPx * 25.4) / dpi; // 1 inch = 25.4 mm
-    setFingerCircumference(mm.toFixed(2)); // Set to 2 decimal places for precision
+    // width-only approach -> circumference ≈ π * width
+    const widthMm = pixelsToMm(fingerWidthPx);
+    const circumference = Math.PI * widthMm;
+    setFingerCircumference(circumference.toFixed(2));
+    measureByCircumference(circumference);
   };
 
-  // Handler for calculating ring diameter based on screen measurement (pixels to mm)
   const handleRingScreenMeasure = () => {
-    const mm = (ringDiameterPx * 25.4) / dpi; // 1 inch = 25.4 mm
-    setRingDiameter(mm.toFixed(2)); // Set to 2 decimal places for precision
+    const mm = pixelsToMm(ringDiameterPx);
+    setRingDiameter(mm.toFixed(2));
+    measureByDiameter(mm);
   };
 
-  // Logic to find the closest ring size based on finger circumference
-  const measureByCircumference = () => {
-    const circumference = Number.parseFloat(fingerCircumference);
-    if (isNaN(circumference)) { // Check if input is a valid number
+  const measureByCircumference = (val?: number) => {
+    const circumference = typeof val === "number" ? val : Number.parseFloat(fingerCircumference);
+    if (isNaN(circumference)) {
       setMeasuredSize(null);
       return;
     }
-
-    // Find the closest size in the chart by minimizing the absolute difference
     const closestSize = balkrushnaSizeChart.reduce((prev, curr) =>
-      Math.abs(curr.circumference - circumference) < Math.abs(prev.circumference - circumference) ? curr : prev,
+      Math.abs(curr.circumference - circumference) < Math.abs(prev.circumference - circumference) ? curr : prev
     );
     setMeasuredSize(closestSize);
   };
 
-  // Logic to find the closest ring size based on ring diameter
-  const measureByDiameter = () => {
-    const diameter = Number.parseFloat(ringDiameter);
-    if (isNaN(diameter)) { // Check if input is a valid number
+  const measureByDiameter = (val?: number) => {
+    const diameter = typeof val === "number" ? val : Number.parseFloat(ringDiameter);
+    if (isNaN(diameter)) {
       setMeasuredSize(null);
       return;
     }
-
-    // Find the closest size in the chart by minimizing the absolute difference
     const closestSize = balkrushnaSizeChart.reduce((prev, curr) =>
-      Math.abs(curr.diameter - diameter) < Math.abs(prev.diameter - diameter) ? curr : prev,
+      Math.abs(curr.diameter - diameter) < Math.abs(prev.diameter - diameter) ? curr : prev
     );
     setMeasuredSize(closestSize);
+  };
+
+  // --- Components ---
+  // Horizontal-only finger adjuster: clear visibility + easy operation
+  const FingerAdjuster = () => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [radiusPx, setRadiusPx] = useState(fingerWidthPx / 2);
+
+    useEffect(() => setRadiusPx(fingerWidthPx / 2), [fingerWidthPx]);
+
+    const startDrag = (e: React.PointerEvent) => {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      setIsAdjusting(true);
+    };
+    const endDrag = (e: React.PointerEvent) => {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      setIsAdjusting(false);
+    };
+
+    const onMoveLeft = (e: React.PointerEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const x = e.clientX;
+      let newRadius = Math.max(Math.min(cx - x, mmToPixels(25)), mmToPixels(5)); // clamp 10–50mm diameter
+      setRadiusPx(newRadius);
+      setFingerWidthPx(newRadius * 2);
+    };
+
+    const onMoveRight = (e: React.PointerEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const x = e.clientX;
+      let newRadius = Math.max(Math.min(x - cx, mmToPixels(25)), mmToPixels(5));
+      setRadiusPx(newRadius);
+      setFingerWidthPx(newRadius * 2);
+    };
+
+    const diameterMmStr = pixelsToMm(radiusPx * 2).toFixed(1);
+
+    return (
+      <div
+        ref={containerRef}
+        className="relative mx-auto w-full max-w-[520px] aspect-square bg-white dark:bg-gray-900 rounded-xl shadow-inner flex items-center justify-center select-none"
+        style={{ touchAction: "none" }}
+      >
+        {/* High-contrast ring outline (visually obvious) */}
+        <div
+          className="absolute rounded-full border-4 border-orange-500/80 shadow"
+          style={{ width: radiusPx * 2, height: radiusPx * 2 }}
+        />
+
+        {/* Vertical guide lines to align finger edges */}
+        <div className="absolute top-6 bottom-6 w-1 bg-orange-500/60" style={{ left: `calc(50% - ${radiusPx}px)` }} />
+        <div className="absolute top-6 bottom-6 w-1 bg-orange-500/60" style={{ left: `calc(50% + ${radiusPx}px)` }} />
+
+        {/* Center dot */}
+        <div className="absolute w-1.5 h-1.5 bg-orange-600 rounded-full" />
+
+        {/* Place-finger hint */}
+        <div className="absolute text-xs px-2 py-1 rounded bg-white/80 dark:bg-gray-900/80">
+          Place finger here & match width
+        </div>
+
+        {/* Left handle */}
+        <div
+          role="slider"
+          aria-label="Adjust left"
+          tabIndex={0}
+          onPointerDown={startDrag}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerMove={(e) => isAdjusting && onMoveLeft(e)}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-6 h-12 rounded-xl border-2 border-orange-600 bg-white dark:bg-gray-800 shadow cursor-ew-resize"
+          style={{ left: `calc(50% - ${radiusPx}px)`, top: "50%" }}
+        />
+
+        {/* Right handle */}
+        <div
+          role="slider"
+          aria-label="Adjust right"
+          tabIndex={0}
+          onPointerDown={startDrag}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerMove={(e) => isAdjusting && onMoveRight(e)}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-6 h-12 rounded-xl border-2 border-orange-600 bg-white dark:bg-gray-800 shadow cursor-ew-resize"
+          style={{ left: `calc(50% + ${radiusPx}px)`, top: "50%" }}
+        />
+
+        {/* Live readout */}
+        <div className="absolute bottom-3 px-3 py-1 rounded bg-white/90 dark:bg-gray-900/80 text-xs font-medium">
+          {diameterMmStr} mm (width)
+        </div>
+      </div>
+    );
+  };
+
+  // Existing ring adjuster retained for Ring tab use
+  const RingAdjuster = () => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [radiusPx, setRadiusPx] = useState(ringDiameterPx / 2);
+    useEffect(() => setRadiusPx(ringDiameterPx / 2), [ringDiameterPx]);
+
+    const startDrag = (e: React.PointerEvent) => {
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      setIsAdjusting(true);
+    };
+    const endDrag = (e: React.PointerEvent) => {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      setIsAdjusting(false);
+      handleRingScreenMeasure();
+    };
+    const onMoveLeft = (e: React.PointerEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const x = e.clientX;
+      let newRadius = Math.min(Math.max(cx - x, 10), mmToPixels(25));
+      setRadiusPx(newRadius);
+      setRingDiameterPx(newRadius * 2);
+    };
+    const onMoveRight = (e: React.PointerEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const x = e.clientX;
+      let newRadius = Math.min(Math.max(x - cx, 10), mmToPixels(25));
+      setRadiusPx(newRadius);
+      setRingDiameterPx(newRadius * 2);
+    };
+    const diameterMmStr = pixelsToMm(radiusPx * 2).toFixed(1);
+
+    return (
+      <div
+        ref={containerRef}
+        className="relative mx-auto w-full max-w-[520px] aspect-square bg-white dark:bg-gray-900 rounded-xl shadow-inner flex items-center justify-center select-none"
+        style={{ touchAction: "none" }}
+      >
+        <div
+          className="absolute rounded-full border-2 border-dashed border-orange-500/70"
+          style={{ width: radiusPx * 2, height: radiusPx * 2 }}
+        />
+        <div className="absolute w-1 h-1 bg-orange-500 rounded-full" />
+        <div
+          role="slider"
+          aria-label="Adjust left"
+          tabIndex={0}
+          onPointerDown={startDrag}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerMove={(e) => isAdjusting && onMoveLeft(e)}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-5 h-10 rounded-xl border-2 border-orange-500 bg-white dark:bg-gray-800 shadow cursor-ew-resize"
+          style={{ left: `calc(50% - ${radiusPx}px)`, top: "50%" }}
+        />
+        <div
+          role="slider"
+          aria-label="Adjust right"
+          tabIndex={0}
+          onPointerDown={startDrag}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerMove={(e) => isAdjusting && onMoveRight(e)}
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-5 h-10 rounded-xl border-2 border-orange-500 bg-white dark:bg-gray-800 shadow cursor-ew-resize"
+          style={{ left: `calc(50% + ${radiusPx}px)`, top: "50%" }}
+        />
+        <div className="absolute top-4 bottom-4 w-0.5 bg-orange-500/50" style={{ left: `calc(50% - ${radiusPx}px)` }} />
+        <div className="absolute top-4 bottom-4 w-0.5 bg-orange-500/50" style={{ left: `calc(50% + ${radiusPx}px)` }} />
+        <div className="absolute bottom-3 px-3 py-1 rounded bg-white/80 dark:bg-gray-900/80 text-xs">{diameterMmStr} mm</div>
+      </div>
+    );
+  };
+
+  const maxRingDiameterPx = mmToPixels(50);
+
+  const calibrationSummary = () => {
+    const pxPerMm = dpi / (25.4 / calibrationFactor);
+    return `${pxPerMm.toFixed(1)} px/mm`;
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 font-sans bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 min-h-screen">
-      <div className="text-center mb-12">
-        {/* Balkrushna Branding */}
-        {/* Adjusted font sizes for smaller screens */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700 dark:from-orange-300 dark:to-orange-500 mb-2 drop-shadow-lg">BALKRUSHNA</h1>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-orange-600 dark:text-orange-400 mb-4">Ring Size Guide</h2>
-        <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-          Find your perfect ring size with Balkrushna's comprehensive guide.
-        </p>
+    <div className="container mx-auto px-4 py-8 font-sans bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700 dark:from-orange-300 dark:to-orange-500 mb-2">
+          BALKRUSHNA
+        </h1>
+        <h2 className="text-2xl font-semibold text-orange-600 dark:text-orange-400">Precision Ring Sizing Tool</h2>
+        <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">Calibration: {calibrationSummary()}</div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="finger" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-1 shadow-md">
-              <TabsTrigger
-                value="finger"
-                className="flex items-center justify-center gap-2 py-2 px-2 sm:px-4 rounded-md text-sm md:text-lg font-medium
-                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
-                                dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
-                                transition-all duration-300 ease-in-out hover:scale-105"
-              >
-                <Hand className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" /> <span className="hidden sm:inline">Method 2:</span> Measure Finger
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2 bg-gray-200 dark:bg-gray-700">
+              <TabsTrigger value="finger" className="flex items-center gap-2">
+                <Hand size={18} /> Finger
               </TabsTrigger>
-              <TabsTrigger
-                value="ring"
-                className="flex items-center justify-center gap-2 py-2 px-2 sm:px-4 rounded-md text-sm md:text-lg font-medium
-                                data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg
-                                dark:data-[state=active]:from-orange-400 dark:data-[state=active]:to-orange-500 dark:data-[state=active]:text-gray-900
-                                transition-all duration-300 ease-in-out hover:scale-105"
-              >
-                <Scan className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" /> <span className="hidden sm:inline">Method 1:</span> Measure Ring
+              <TabsTrigger value="ring" className="flex items-center gap-2">
+                <Scan size={18} /> Ring
               </TabsTrigger>
             </TabsList>
 
-            {/* Method 2: The Hands-On Approach (Measure Finger Circumference) */}
-            <TabsContent value="finger" className="space-y-6 mt-6">
-              <Card className="border-orange-300 dark:border-orange-600 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-                <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-                  <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-bold">
-                    <Hand className="h-7 w-7 md:h-8 md:w-8" /> Measure Your Finger (Circumference)
+            {/* ===== Finger Measurement (Calibrated) ===== */}
+            <TabsContent value="finger" className="mt-4">
+              <Card className="border-orange-200 dark:border-orange-800">
+                <CardHeader className="bg-orange-50 dark:bg-orange-900/30">
+                  <CardTitle className="flex items-center gap-3">
+                    <Hand size={24} /> Finger Measurement (Calibrate → Adjust → Size)
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 p-6 md:p-8">
-                  <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed">
-                    Wrap a measuring tape, string, or strip of paper around the base of the finger you intend to wear the ring on. Mark where the ends meet and then measure the length in millimeters (mm) to find your finger's circumference.
-                  </p>
-                  <div className="border-2 border-dashed border-gray-400 dark:border-gray-600 p-6 rounded-lg text-center bg-gray-50 dark:bg-gray-700">
-                    <p className="mb-3 text-sm md:text-base text-gray-600 dark:text-gray-400">
-                      **For Screen Measurement (Approximate):** Place your finger on the adjustable rectangle below and use the sliders to visually match its width and height. This provides an estimated circumference. *Note: Screen measurements can vary based on device DPI and browser zoom settings. For best accuracy, keep your browser zoom at 100%.*
-                    </p>
-                    <div
-                      ref={fingerRef}
-                      style={{ width: `${fingerWidthPx}px`, height: `${fingerHeightPx}px`, border: '2px solid #f97316', borderRadius: '8px' }}
-                      className="mx-auto bg-gray-200 dark:bg-gray-900 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs overflow-hidden transition-all duration-100 ease-linear" // Reduced text size for finger measurement
-                    >
-                      <span className="px-2">{`W: ${(fingerWidthPx * 25.4 / dpi).toFixed(2)} mm, H: ${(fingerHeightPx * 25.4 / dpi).toFixed(2)} mm`}</span>
-                    </div>
-                    <div className="mt-4 flex flex-col md:flex-row gap-4">
-                      <div className="w-full">
-                        <label htmlFor="finger-width-slider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjust Width:</label>
-                        <input
-                          id="finger-width-slider"
-                          type="range"
-                          min="50"
-                          max="400"
-                          value={fingerWidthPx}
-                          onChange={(e) => setFingerWidthPx(Number(e.target.value))}
-                          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-gray-600 accent-orange-500 dark:accent-orange-400"
-                        />
+                <CardContent className="p-6 space-y-6">
+                  {/* Step 1: Credit-card calibration */}
+                  <div className="rounded-lg border border-dashed border-orange-300 dark:border-orange-700 p-4 bg-gray-50 dark:bg-gray-800">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <CreditCard size={16} />
+                        <span>Step 1 — Calibrate screen with a real credit/ATM card (85.60 × 53.98 mm).</span>
                       </div>
-                      <div className="w-full">
-                        <label htmlFor="finger-height-slider" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjust Height:</label>
-                        <input
-                          id="finger-height-slider"
-                          type="range"
-                          min="30"
-                          max="200"
-                          value={fingerHeightPx}
-                          onChange={(e) => setFingerHeightPx(Number(e.target.value))}
-                          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-gray-600 accent-orange-500 dark:accent-orange-400"
-                        />
-                      </div>
+                      <Button variant="outline" onClick={() => setShowCardCalib(true)} className="border-orange-500 text-orange-600">
+                        Open Calibration
+                      </Button>
                     </div>
-                    <Button
-                      variant="outline"
-                      className="mt-6 w-full md:w-auto border-orange-500 text-orange-700 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 transition-colors duration-200"
-                      onClick={handleFingerScreenMeasure}
-                    >
-                      Use Finger on Screen Measurement
-                    </Button>
                   </div>
 
-                  <Input
-                    type="number"
-                    placeholder="Or enter finger circumference in mm (e.g., 55.10)"
-                    value={fingerCircumference}
-                    onChange={(e) => setFingerCircumference(e.target.value)}
-                    className="border-orange-300 dark:border-orange-600 focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-md p-2"
-                  />
-                  <Button
-                    onClick={measureByCircumference}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white dark:from-orange-400 dark:to-orange-500 dark:hover:from-orange-500 dark:hover:to-orange-600 dark:text-gray-900 flex items-center justify-center gap-2 py-3 md:py-4 text-base md:text-lg rounded-md transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
-                  >
-                    <Ruler className="h-5 w-5 md:h-6 md:w-6" /> Calculate Ring Size by Circumference
-                  </Button>
+                  {/* Step 2: Place finger & adjust horizontally */}
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-dashed border-orange-300 dark:border-orange-700">
+                    <div className="flex flex-col items-center mb-4 w-full" ref={fingerRef}>
+                      <div className="w-full">
+                        <FingerAdjuster />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button onClick={handleFingerScreenMeasure} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                        Use This Finger Width
+                      </Button>
+                      <div className="flex-1 flex items-center gap-2">
+                        <Ruler size={16} className="text-gray-600" />
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                          Width: {pixelsToMm(fingerWidthPx).toFixed(2)} mm
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Fine adjust slider (horizontal only) */}
+                    <div className="pt-4">
+                      <label className="block text-sm font-medium mb-1">Fine Adjust (10–50 mm)</label>
+                      <input
+                        type="range"
+                        min={mmToPixels(10)}
+                        max={mmToPixels(50)}
+                        value={fingerWidthPx}
+                        onChange={(e) => setFingerWidthPx(Number(e.target.value))}
+                        className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                      />
+                      <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                        {pixelsToMm(fingerWidthPx).toFixed(2)} mm
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Optional: manual entry */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">Or enter circumference (mm)</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="e.g., 55.10"
+                        value={fingerCircumference}
+                        onChange={(e) => setFingerCircumference(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button onClick={() => measureByCircumference()} className="bg-orange-500 hover:bg-orange-600 text-white">
+                        Calculate
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Method 1: Using an Existing Ring (Measure Ring Diameter) */}
-            <TabsContent value="ring" className="space-y-6 mt-6">
-              <Card className="border-orange-300 dark:border-orange-600 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-                <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-                  <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-bold">
-                    <Scan className="h-7 w-7 md:h-8 md:w-8" /> Measure Existing Ring (Diameter)
+            {/* ===== Ring Measurement (existing, with coin calibration) ===== */}
+            <TabsContent value="ring" className="mt-4">
+              <Card className="border-orange-200 dark:border-orange-800">
+                <CardHeader className="bg-orange-50 dark:bg-orange-900/30">
+                  <CardTitle className="flex items-center gap-3">
+                    <Scan size={24} /> Ring Measurement Guide
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 p-6 md:p-8">
-                  <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg leading-relaxed">
-                    Choose a ring that already fits your finger well. Measure the inner diameter of the ring in millimeters (mm) using a ruler.
-                  </p>
-                  <div className="border-2 border-dashed border-gray-400 dark:border-gray-600 p-6 rounded-lg text-center bg-gray-50 dark:bg-gray-700">
-                    <p className="mb-3 text-sm md:text-base text-gray-600 dark:text-gray-400">
-                      **For Screen Measurement (Approximate):** Place your ring on the adjustable ring design below and use the slider to visually match its inner diameter. *Note: Screen measurements can vary based on device DPI and browser zoom settings. For best accuracy, keep your browser zoom at 100%.*
-                    </p>
-                    <div
-                      ref={ringRef}
-                      style={{
-                        width: `${ringDiameterPx}px`,
-                        height: `${ringDiameterPx}px`,
-                        borderRadius: '50%',
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        // Outer ring appearance with gradient and shadow
-                        background: 'linear-gradient(45deg, #fbbf24, #f97316)', // Orange gradient
-                        padding: '4px', // This creates the "thickness"
-                        boxShadow: '0px 4px 10px rgba(0,0,0,0.2), inset 0 0 0 2px rgba(255,255,255,0.5)', // Subtle shadow and inner highlight
-                      }}
-                      className="mx-auto text-gray-800 dark:text-gray-100 text-xs overflow-hidden transition-all duration-100 ease-linear" // Reduced text size for ring measurement
-                    >
-                      {/* Inner transparent part of the ring */}
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: '50%',
-                          backgroundColor: 'white', // Inner "hole" color
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#333', // Darker text for better contrast
-                          fontSize: '0.875rem', // text-sm
-                          fontWeight: 'bold',
-                          boxShadow: 'inset 0 0 5px rgba(0,0,0,0.2)', // Inner shadow for depth
-                        }}
-                        className="dark:bg-gray-900 dark:text-gray-300"
-                      >
-                        {`Approx. ${(ringDiameterPx * 25.4 / dpi).toFixed(2)} mm`}
+                <CardContent className="p-6 space-y-6">
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-dashed border-orange-300 dark:border-orange-700">
+                    <div className="flex flex-col items-center mb-4 w-full" ref={ringRef}>
+                      <div className="w-full">
+                        <RingAdjuster />
                       </div>
                     </div>
-                    <input
-                      type="range"
-                      min="30"
-                      max="200"
-                      value={ringDiameterPx}
-                      onChange={(e) => setRingDiameterPx(Number(e.target.value))}
-                      className="w-full mt-4 h-2 rounded-lg appearance-none cursor-pointer bg-gray-300 dark:bg-gray-600 accent-orange-500 dark:accent-orange-400"
-                    />
-                    <Button
-                      variant="outline"
-                      className="mt-6 w-full md:w-auto border-orange-500 text-orange-700 hover:bg-orange-50 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 transition-colors duration-200"
-                      onClick={handleRingScreenMeasure}
-                    >
-                      Use Ring on Screen Measurement
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button onClick={handleRingScreenMeasure} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                        Use This Measurement
+                      </Button>
+                      <Button variant="outline" onClick={() => setShowCalibration(true)} className="flex items-center gap-1">
+                        <Coins size={16} /> Calibrate (₹2 coin)
+                      </Button>
+                    </div>
                   </div>
 
-                  <Input
-                    type="number"
-                    placeholder="Or enter ring inner diameter in mm (e.g., 17.50)"
-                    value={ringDiameter}
-                    onChange={(e) => setRingDiameter(e.target.value)}
-                    className="border-orange-300 dark:border-orange-600 focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 rounded-md p-2"
-                  />
-                  <Button
-                    onClick={measureByDiameter}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white dark:from-orange-400 dark:to-orange-500 dark:hover:from-orange-500 dark:hover:to-orange-600 dark:text-gray-900 flex items-center justify-center gap-2 py-3 md:py-4 text-base md:text-lg rounded-md transition-all duration-200 ease-in-out shadow-md hover:shadow-lg"
-                  >
-                    <Ruler className="h-5 w-5 md:h-6 md:w-6" /> Calculate Ring Size by Diameter
-                  </Button>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">Or enter diameter (mm)</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="e.g., 17.50"
+                        value={ringDiameter}
+                        onChange={(e) => setRingDiameter(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button onClick={() => measureByDiameter()} className="bg-orange-500 hover:bg-orange-600 text-white">
+                        Calculate
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <label className="block text-sm font-medium mb-1">Fine Adjust (up to 50mm)</label>
+                    <input
+                      type="range"
+                      min={mmToPixels(5)}
+                      max={Math.max(mmToPixels(10), maxRingDiameterPx)}
+                      value={ringDiameterPx}
+                      onChange={(e) => setRingDiameterPx(Number(e.target.value))}
+                      className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    />
+                    <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">{pixelsToMm(ringDiameterPx).toFixed(2)} mm</div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
 
-          {measuredSize && (
-            <Card className="mt-8 border-orange-500 dark:border-orange-400 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-              <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-                <CardTitle className="text-2xl md:text-3xl font-bold">Your Balkrushna Ring Size</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 md:p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
-                  <div>
-                    <Badge variant="secondary" className="mb-3 bg-gray-100 dark:bg-gray-700 text-orange-700 dark:text-orange-300 text-base md:text-lg px-4 py-2 rounded-full shadow-sm">Indian Size</Badge>
-                    <div className="text-4xl md:text-5xl font-bold text-orange-600 dark:text-orange-400 mt-2">{measuredSize.indian}</div>
-                  </div>
-                  <div>
-                    <Badge variant="secondary" className="mb-3 bg-gray-100 dark:bg-gray-700 text-orange-700 dark:text-orange-300 text-base md:text-lg px-4 py-2 rounded-full shadow-sm">Measurements</Badge>
-                    <div className="text-xl md:text-2xl text-gray-800 dark:text-gray-200 mt-2">
-                      <strong>Diameter:</strong> {measuredSize.diameter} mm <br />
-                      <strong>Circumference:</strong> {measuredSize.circumference} mm
+          {/* ===== Credit Card Calibration Modal ===== */}
+          {showCardCalib && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard size={20} /> Calibrate with Credit/ATM Card
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Hold a real card against the screen and resize the orange outline until it exactly matches your
+                    card's width. The height keeps the correct ratio automatically (ID-1 standard 85.60 × 53.98 mm).
+                  </p>
+
+                  <div className="flex justify-center">
+                    <div
+                      className="relative rounded-xl border-2 border-orange-500 bg-white/60 dark:bg-gray-900/40"
+                      style={{ width: `${cardWidthPx}px`, height: `${(cardWidthPx * 53.98) / 85.6}px` }}
+                    >
+                      <div className="absolute inset-2 rounded-lg border border-dashed border-orange-400" />
+                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-6 text-xs bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
+                        Width: {pixelsToMm(cardWidthPx).toFixed(1)} mm
+                      </span>
                     </div>
                   </div>
+
+                  <input
+                    type="range"
+                    min={mmToPixels(60)}
+                    max={mmToPixels(120)}
+                    value={cardWidthPx}
+                    onChange={(e) => setCardWidthPx(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                  />
+
+                  <div className="flex gap-2">
+                    <Button onClick={confirmCardCalibration} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                      Confirm Calibration
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowCardCalib(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* ===== 2 Rupee Coin Calibration (Ring tab) ===== */}
+          {showCalibration && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Coins size={20} /> Calibrate with 2 Rupee Coin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Place a ₹2 coin (25 mm) on the screen and drag until the orange guides touch the coin's edges. Then
+                    confirm.
+                  </p>
+                  <div className="flex justify-center">
+                    <div
+                      style={{ width: ringDiameterPx, height: ringDiameterPx }}
+                      className="relative rounded-full border-2 border-orange-500"
+                    >
+                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-6 text-xs bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
+                        {pixelsToMm(ringDiameterPx).toFixed(1)} mm
+                      </span>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min={mmToPixels(10)}
+                    max={maxRingDiameterPx}
+                    value={ringDiameterPx}
+                    onChange={(e) => setRingDiameterPx(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                  />
+                  <div className="flex gap-2">
+                    <Button onClick={calibrateWithCoin} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                      Confirm Calibration
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowCalibration(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* ===== Results ===== */}
+          {measuredSize && (
+            <Card className="border-green-200 dark:border-green-800">
+              <CardHeader className="bg-green-50 dark:bg-green-900/20">
+                <CardTitle className="text-xl">Your Ring Size</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Indian Size</div>
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">{measuredSize.indian}</div>
                 </div>
-                <p className="mt-6 text-sm md:text-base text-center text-gray-600 dark:text-gray-400 leading-relaxed">
-                  This is the closest Balkrushna size based on your measurement.
-                  Use this to buy your chosen ring online at Balkrushna.
-                </p>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Diameter</div>
+                  <div className="text-xl font-semibold">{measuredSize.diameter} mm</div>
+                </div>
+                <div className="col-span-2 text-center">
+                  <Button variant="outline" className="border-orange-500 text-orange-600">
+                    View International Sizes <ArrowRight size={16} className="ml-2" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Important Measurement Tips - Moved here */}
-          <Card className="mt-8 border-orange-500 dark:border-orange-400 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-              <CardTitle className="text-xl md:text-2xl font-bold">Important Measurement Tips</CardTitle>
+          {/* ===== Help ===== */}
+          <Card className="border-blue-200 dark:border-blue-800">
+            <CardHeader className="bg-blue-50 dark:bg-blue-900/20 cursor-pointer" onClick={() => setShowHelp(!showHelp)}>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info size={20} /> Measurement Tips
+                </div>
+                <div className="text-sm font-normal">{showHelp ? "Hide" : "Show"}</div>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-base p-6 md:p-8 text-gray-700 dark:text-gray-300 leading-relaxed">
-              <p>✔️ Measure during the end of the day, as your finger may be at its largest.</p>
-              <p>✔️ To maintain accuracy, avoid zooming your browser when using screen measurement. Keep the browser zoom at 100%.</p>
-              <p>✔️ Avoid measuring when your hands are very cold or hot, as finger size can fluctuate.</p>
-              <p>✔️ If the ring style is wide, consider going up half a size for a more comfortable fit.</p>
-              <p>✔️ When in doubt, it's generally better to choose a slightly larger size than one that is too small.</p>
-            </CardContent>
+            {showHelp && (
+              <CardContent className="p-6 space-y-3 text-sm">
+                <p className="flex items-start gap-2">
+                  <Circle size={12} className="mt-1 flex-shrink-0 text-blue-500" />
+                  <span>Measure at the end of the day when fingers are typically largest.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <Circle size={12} className="mt-1 flex-shrink-0 text-blue-500" />
+                  <span>Keep browser zoom at 100% and calibrate with a card for best accuracy.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <Circle size={12} className="mt-1 flex-shrink-0 text-blue-500" />
+                  <span>For wide bands, consider going up half a size for comfort.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <Circle size={12} className="mt-1 flex-shrink-0 text-blue-500" />
+                  <span>Measure 3–4 times and take the most frequent result.</span>
+                </p>
+              </CardContent>
+            )}
           </Card>
         </div>
 
-        {/* Chart & Couple Calculator Section */}
-        <div>
-          <Card className="border-orange-300 dark:border-orange-600 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-              <CardTitle className="text-xl md:text-2xl font-bold">Balkrushna Ring Size Chart</CardTitle>
+        {/* ===== Size Chart Sidebar ===== */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="bg-orange-50 dark:bg-orange-900/30">
+              <CardTitle>Balkrushna Size Chart</CardTitle>
             </CardHeader>
-            <CardContent className="max-h-96 lg:max-h-[600px] overflow-y-auto p-0">
-              <div className="grid grid-cols-3 gap-2 text-sm md:text-base font-semibold border-b border-orange-300 dark:border-orange-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-3 px-4 sticky top-0 z-10">
-                <div>Indian Size</div>
-                <div>Circumference (mm)</div>
-                <div>Diameter (mm)</div>
+            <CardContent className="p-0">
+              <div className="overflow-y-auto max-h-[500px]">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gray-100 dark:bg-gray-800">
+                    <tr>
+                      <th className="p-3 text-left">Size</th>
+                      <th className="p-3 text-left">Diameter (mm)</th>
+                      <th className="p-3 text-left">Circumference (mm)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {balkrushnaSizeChart.map((size) => (
+                      <tr
+                        key={size.indian}
+                        className={`border-t border-gray-200 dark:border-gray-700 ${
+                          measuredSize?.indian === size.indian
+                            ? "bg-orange-50 dark:bg-orange-900/20 font-medium"
+                            : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <td className="p-3">{size.indian}</td>
+                        <td className="p-3">{size.diameter}</td>
+                        <td className="p-3">{size.circumference}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              {balkrushnaSizeChart.map((size, index) => (
-                <div
-                  key={index}
-                  className={`grid grid-cols-3 gap-2 text-sm md:text-base py-2 px-4
-                    ${measuredSize?.indian === size.indian
-                      ? "bg-orange-50 dark:bg-orange-900/30 font-bold text-orange-700 dark:text-orange-300"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200"
-                    } transition-colors duration-150`}
-                >
-                  <div className="font-medium">{size.indian}</div>
-                  <div>{size.circumference}</div>
-                  <div>{size.diameter}</div>
-                </div>
-              ))}
             </CardContent>
           </Card>
 
-          <Card className="mt-8 border-orange-300 dark:border-orange-600 rounded-xl shadow-lg dark:shadow-none bg-white dark:bg-gray-800">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-white rounded-t-xl p-4 md:p-6">
-              <CardTitle className="text-xl md:text-2xl font-bold">Couple Ring Size Calculator</CardTitle>
+          <Card>
+            <CardHeader className="bg-purple-50 dark:bg-purple-900/20">
+              <CardTitle>International Conversions</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 md:p-8">
-              <div className="mb-6">
-                <h3 className="font-semibold text-lg md:text-xl text-orange-700 dark:text-orange-400 mb-3">Men's Ring Sizes:</h3>
-                <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                  {Object.entries(menRingSizes).map(([key, value]) => (
-                    <li key={key}>
-                      Size {key}: <span className="font-medium">{value} mm</span> (Diameter)
-                    </li>
-                  ))}
-                </ul>
+            <CardContent className="p-6 space-y-4">
+              <div className="space-y-2">
+                <h3 className="font-medium">US & Canada</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Add 0.5 to Balkrushna size for approximate US size</div>
               </div>
-              <div className="mb-6">
-                <h3 className="font-semibold text-lg md:text-xl text-orange-700 dark:text-orange-400 mb-3">Women's Ring Sizes:</h3>
-                <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                  {Object.entries(womenRingSizes).map(([key, value]) => (
-                    <li key={key}>
-                      Size {key}: <span className="font-medium">{value} mm</span> (Diameter)
-                    </li>
-                  ))}
-                </ul>
+              <div className="space-y-2">
+                <h3 className="font-medium">UK & Australia</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Subtract 1.5 from Balkrushna size for approximate UK size</div>
               </div>
-
-              <h3 className="font-semibold text-lg md:text-xl text-orange-700 dark:text-orange-400 mb-4">Couple Size Codes:</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm md:text-base text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
-                <div className="font-bold text-orange-700 dark:text-orange-400 py-1 border-b border-gray-300 dark:border-gray-600">Couple Size Code</div>
-                <div className="font-bold text-orange-700 dark:text-orange-400 py-1 border-b border-gray-300 dark:border-gray-600">Individual Sizes</div>
-                {coupleSizeCodes.map((pair) => (
-                  <div key={pair.code} className="contents"> {/* Use contents to avoid extra div that breaks grid */}
-                    <div className="py-1">{pair.code}</div>
-                    <div className="py-1 font-medium">{pair.individual}</div>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                <h3 className="font-medium">Europe</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Multiply Balkrushna size by 1.25 for approximate EU size</div>
               </div>
             </CardContent>
           </Card>
