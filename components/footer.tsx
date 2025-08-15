@@ -1,5 +1,12 @@
-import Link from "next/link"
-import { Facebook, Instagram, Twitter, Phone, Mail, MapPin } from "lucide-react"
+import Link from "next/link";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Phone,
+  Mail,
+  MapPin,
+} from "lucide-react";
 
 export function Footer() {
   return (
@@ -9,20 +16,21 @@ export function Footer() {
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">bkj</span>
-            </div>
-            <div className="hidden md:block">
-              <span className="text-xl font-bold text-red-700 dark:text-white">
-                BALKRUSHNA
-              </span>
-              <div className="text-sm text-red-700 font-medium">
-                JEWELLERS
+              <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-lg">bkj</span>
+              </div>
+              <div className="hidden md:block">
+                <span className="text-xl font-bold text-red-700 dark:text-white">
+                  BALKRUSHNA
+                </span>
+                <div className="text-sm text-red-700 font-medium">
+                  JEWELLERS
+                </div>
               </div>
             </div>
-            </div>
             <p className="text-gray-300 mb-4">
-              Premium quality jewelry with 25+ years of trust and excellence in craftsmanship.
+              Premium quality jewelry with 25+ years of trust and excellence in
+              craftsmanship.
             </p>
             <div className="flex space-x-4">
               <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
@@ -41,17 +49,26 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/catalog" className="text-gray-300 hover:text-white">
+                <Link
+                  href="/catalog"
+                  className="text-gray-300 hover:text-white"
+                >
                   Catalog
                 </Link>
               </li>
               <li>
-                <Link href="/gold-scheme" className="text-gray-300 hover:text-white">
+                <Link
+                  href="/gold-scheme"
+                  className="text-gray-300 hover:text-white"
+                >
                   Gold Scheme
                 </Link>
               </li>
               <li>
-                <Link href="/digital-gold" className="text-gray-300 hover:text-white">
+                <Link
+                  href="/digital-gold"
+                  className="text-gray-300 hover:text-white"
+                >
                   Digital Gold
                 </Link>
               </li>
@@ -68,7 +85,10 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/ring-measurement" className="text-gray-300 hover:text-white">
+                <Link
+                  href="/ring-measurement"
+                  className="text-gray-300 hover:text-white"
+                >
                   Ring Measurement
                 </Link>
               </li>
@@ -97,14 +117,16 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-orange-400" />
-                <span className="text-gray-300">info@balkrushnajewellers.com</span>
+                <span className="text-gray-300">
+                  info@balkrushnajewellers.com
+                </span>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-orange-400 mt-1" />
                 <span className="text-gray-300">
-                 Gandhi Rd, Ganotri Society,
+                  Gandhi Rd, Ganotri Society,
                   <br />
-                 Himatnagar, Gujarat 380001 India
+                  Himatnagar, Gujarat 380001 India
                 </span>
               </div>
             </div>
@@ -112,9 +134,18 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">© 2024 BALKRUSHNA JEWELLERS. All rights reserved.</p>
+          <p className="text-gray-400">
+            © {new Date().getFullYear()} BALKRUSHNA JEWELLERS. All rights
+            reserved. Website Design and Development by{" "}
+            <a
+              href="https://bluecoreit.tech"
+              className="text-orange-400 hover:underline"
+            >
+              Bluecore IT
+            </a>
+          </p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

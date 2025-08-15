@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
 interface Product {
   id: string;
@@ -47,10 +46,6 @@ const categoryFilterDefinitions: Record<
       options: ["Gold", "Silver", "Platinum", "Rose Gold"],
     },
     purity: { label: "Purity", options: ["18K", "22K", "24K"] },
-    priceRange: {
-      label: "Price",
-      options: ["< $500", "$500 - $1500", "> $1500"],
-    },
   },
   Ring: {
     style: {
@@ -68,10 +63,6 @@ const categoryFilterDefinitions: Record<
     metal: {
       label: "Metal",
       options: ["White Gold", "Rose Gold", "Yellow Gold", "Platinum"],
-    },
-    priceRange: {
-      label: "Price",
-      options: ["< $500", "$500 - $1500", "> $1500"],
     },
   },
   Necklaces: {
@@ -115,6 +106,16 @@ export default function CatalogPage() {
     Record<string, Record<string, string[]>>
   >({});
   const [filterSearch, setFilterSearch] = useState<Record<string, string>>({});
+
+  const hasProductsWithPrices = useMemo(() => {
+    return products.some((product) => product.price || product.priceRange);
+  }, [products]);
+
+  const getFilterDefinitionsForCategory = (category: string) => {
+    return (
+      categoryFilterDefinitions[category] || categoryFilterDefinitions["all"]
+    );
+  };
 
   // Fetch products from your API endpoint
   useEffect(() => {
@@ -206,9 +207,7 @@ export default function CatalogPage() {
       cur = cur.filter((p) => p.category === selectedCategory);
     }
 
-    const defs =
-      categoryFilterDefinitions[selectedCategory] ||
-      categoryFilterDefinitions["all"];
+    const defs = getFilterDefinitionsForCategory(selectedCategory);
     const selections = activeFiltersForCategory || {};
 
     Object.keys(defs || {}).forEach((filterKey) => {
@@ -252,6 +251,7 @@ export default function CatalogPage() {
     selectedFilters,
     sortBy,
     activeFiltersForCategory,
+    hasProductsWithPrices,
   ]);
 
   const anyFilterActiveForCategory = useMemo(() => {
@@ -260,8 +260,7 @@ export default function CatalogPage() {
   }, [selectedFilters, selectedCategory]);
 
   const getFilteredOptions = (category: string, key: string) => {
-    const def =
-      categoryFilterDefinitions[category] || categoryFilterDefinitions["all"];
+    const def = getFilterDefinitionsForCategory(category);
     const opts = def[key]?.options || [];
     const q = (filterSearch[`${category}.${key}`] || "").trim().toLowerCase();
     if (!q) return opts;
@@ -373,8 +372,7 @@ export default function CatalogPage() {
 
           <div className="mt-5 pt-5 border-t border-stone-200/80 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(
-              categoryFilterDefinitions[selectedCategory] ||
-                categoryFilterDefinitions["all"]
+              getFilterDefinitionsForCategory(selectedCategory)
             ).map(([filterKey, def]) => (
               <div
                 key={filterKey}
@@ -471,102 +469,44 @@ export default function CatalogPage() {
             </div>
           ) : (
             <>
-             <section className="text-center mb-8 w-92">
-                    <h2 className="inline-block pb-1 select-none text-amber-600 font-semibold tracking-wide text-5xl">
-                      ≿━━━━༺❀༻━━━━≾ Collections ≿━━━━༺❀༻━━━━≾
-                    </h2>
-                  </section>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {filteredProducts.map((product) => (
-                <article
-                  key={product.id}
-                  className="group bg-white dark:bg-stone-800 rounded-md overflow-hidden shadow-lg hover:shadow-xl border border-amber-100 dark:border-stone-700 hover:border-amber-300 transition-all duration-300 flex flex-col"
-                  style={{ minHeight: "320px", maxHeight: "370px" }}
-                >
-                  {/* Image */}
-                  <div className="relative w-full aspect-[1/1] overflow-hidden rounded-t-md bg-amber-50 dark:bg-stone-700">
-                    <Image
-                      src={
-                        product.image ||
-                        "https://placehold.co/400x400/f7f5f2/333333?text=Jewelry"
-                      }
-                      alt={product.name}
-                      fill
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                    />
-                    {product.rating && product.rating >= 4.8 && (
-                      <div className="absolute top-2 left-2 bg-white/90 dark:bg-stone-900/80 text-amber-700 px-2 py-0.5 rounded-full text-[10px] font-bold shadow border border-amber-200 dark:border-stone-600">
-                        PREMIUM
-                      </div>
-                    )}
-                  </div>
-                  
-                 
+              <section className="text-center mb-8 w-92">
+                <h2 className="inline-block pb-1 select-none text-amber-600 font-semibold tracking-wide text-5xl">
+                  ≿━━━━༺❀༻━━━━≾ Collections ≿━━━━༺❀༻━━━━≾
+                </h2>
+              </section>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {filteredProducts.map((product) => (
+                  <article
+                    key={product.id}
+                    className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col"
+                    style={{ minHeight: "320px", maxHeight: "370px" }}
+                  >
+                    <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-stone-50">
+                      <Image
+                        src={
+                          product.image ||
+                          `/placeholder.svg?height=300&width=300&query=${
+                            product.category || "/placeholder.svg"
+                          } jewelry`
+                        }
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
 
-                  {/* Content */}
-                  <div className="p-3 flex-grow flex flex-col bg-white dark:bg-stone-800">
-                    {/* Category + Rating */}
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-stone-700 text-amber-700 text-[10px] font-semibold uppercase">
+                    <div className="p-4 bg-white text-center">
+                      <h3 className=" text-lg font-semibold text-stone-800 mb-1">
                         {product.category}
-                      </span>
-                      {product.rating && (
-                        <span className="flex items-center gap-1 text-xs text-stone-600 dark:text-stone-300 font-medium">
-                          <StarIcon />
-                          <span>{product.rating}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Name + Metal & Purity in one row */}
-                    <div className="flex items-center justify-between flex-wrap gap-1 mb-3">
-                      <h3 className="font-serif text-lg font-bold text-stone-900 dark:text-white group-hover:text-amber-600 transition">
-                        {product.name}
                       </h3>
-                      {/* <div className="text-sm font-semibold text-stone-700 dark:text-stone-300"> */}
-                      {product.metal}
-                      {product.purity && (
-                        <span className="mx-1">•{product.purity}</span>
-                      )}
+                     
                     </div>
-
-                    {/* Description */}
-                    <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 mb-3">
-                      {product.description}
-                    </p>
-
-                    {/* Footer */}
-                    <div className="mt-auto pt-2 border-t border-stone-100 dark:border-stone-700 flex items-center justify-between">
-                      <Link
-                        href={`/product/${product.id}`}
-                        className="px-3 py-1 rounded-full bg-amber-600 text-white text-xs font-semibold shadow hover:bg-amber-700 transition"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                  </article>
+                ))}
+              </div>
             </>
           )}
         </section>
-
-        {/* <section className="mt-16 md:mt-24">
-          <div className="bg-gradient-to-br from-stone-800 to-stone-900 text-white rounded-2xl p-8 md:p-12 text-center shadow-2xl">
-            <h2 className="text-3xl font-serif mb-3">Custom Creations</h2>
-            <p className="mb-6 text-stone-300 max-w-2xl mx-auto">
-              Have a unique vision? Our artisans can bring your dream piece to
-              life. Contact us for a private consultation.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-block px-8 py-3 bg-white text-stone-900 rounded-full font-bold hover:bg-stone-200 transition-colors shadow-lg"
-            >
-              Book an Appointment
-            </Link>
-          </div>
-        </section> */}
       </main>
     </div>
   );
