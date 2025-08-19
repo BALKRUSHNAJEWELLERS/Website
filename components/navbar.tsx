@@ -56,20 +56,56 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo Section - Elegant and Clean */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-12 h-12 bg-slate-900 dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-md transform transition-transform duration-300 group-hover:scale-105">
-              <span className="text-amber-400 font-bold text-xl tracking-tighter">
-                BKJ
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                background: "#191c20",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "5%",
+                  border: "2.5px solid #d4af37",
+                  borderRadius: "50%",
+                }}
+              />
+              <span
+                style={{
+                  color: "#d4af37",
+                  fontFamily: "'Georgia', 'Times New Roman', serif",
+                  fontWeight: 500,
+                  fontSize: "23px", // 48 * 0.48
+                  letterSpacing: "0.02em",
+                  zIndex: 1,
+                  textTransform: "lowercase",
+                }}
+              >
+                bkj
               </span>
             </div>
+            {/* ...rest of your BALKRUSHNA JEWELLERS code... */}
             <div className="hidden md:block">
+              {" "}
               <div className="flex flex-col">
+                 {" "}
                 <span className="text-xl font-bold text-slate-800 dark:text-slate-100 transition-colors duration-300">
-                  BALKRUSHNA
+                    BALKRUSHNA  {" "}
                 </span>
+                 {" "}
                 <div className="text-xs text-amber-600 dark:text-amber-500 font-semibold tracking-widest">
-                  JEWELLERS
+                    JEWELLERS  {" "}
                 </div>
+                {" "}
               </div>
+              {" "}
             </div>
           </Link>
 
