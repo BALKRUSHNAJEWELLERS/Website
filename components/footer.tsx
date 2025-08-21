@@ -15,21 +15,61 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">bkj</span>
-              </div>
-              <div className="hidden md:block">
-                <span className="text-xl font-bold text-red-700 dark:text-white">
-                  BALKRUSHNA
-                </span>
-                <div className="text-sm text-red-700 font-medium">
-                  JEWELLERS
-                </div>
-              </div>
+             <Link href="/" className="flex items-center space-x-3 group">
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                background: "#191c20",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "5%",
+                  border: "2.5px solid #d4af37",
+                  borderRadius: "50%",
+                }}
+              />
+              <span
+                style={{
+                  color: "#d4af37",
+                  fontFamily: "'Georgia', 'Times New Roman', serif",
+                  fontWeight: 500,
+                  fontSize: "23px", // 48 * 0.48
+                  letterSpacing: "0.02em",
+                  zIndex: 1,
+                  textTransform: "lowercase",
+                }}
+              >
+                bkj
+              </span>
             </div>
+            {/* ...rest of your BALKRUSHNA JEWELLERS code... */}
+            <div className="hidden md:block">
+              {" "}
+              <div className="flex flex-col">
+                 {" "}
+                <span className="text-xl font-bold text-slate-100 transition-colors duration-300">
+                    BALKRUSHNA  {" "}
+                </span>
+                 {" "}
+                <div className="text-xs text-amber-600 dark:text-amber-500 font-semibold tracking-widest">
+                    JEWELLERS  {" "}
+                </div>
+                {" "}
+              </div>
+              {" "}
+            </div>
+          </Link>
             <p className="text-gray-300 mb-4">
-              Premium quality jewelry with 25+ years of trust and excellence in
+              Premium quality jewelry with 75+ years of trust and excellence in
               craftsmanship.
             </p>
             <div className="flex space-x-4">
