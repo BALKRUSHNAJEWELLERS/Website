@@ -55,9 +55,7 @@ export const metadata: Metadata = {
     "Jewelry Blog",
     "Jewelry News",
   ],
-  alternates: {
-    canonical: "https://balkrushnajewellers.com",
-  },
+  
   authors: {
     name: "Bluecore IT",
     url: "bluecoreit.tech",
