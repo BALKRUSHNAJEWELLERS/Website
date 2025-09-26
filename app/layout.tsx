@@ -60,6 +60,9 @@ export const metadata: Metadata = {
     name: "Bluecore IT",
     url: "bluecoreit.tech",
   },
+  alternates:{
+    canonical: "https://balkrushnajewellers.com",
+  },
   creator: "Bluecore IT",
   publisher: "Bluecore IT",
 };
