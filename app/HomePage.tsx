@@ -254,9 +254,8 @@ function MobileStory() {
                         <div
                           className="absolute inset-0 rounded-full animate-spin"
                           style={{
-                            border: `3px dotted hsl(${
-                              (index * 60) % 360
-                            }, 80%, 60%)`,
+                            border: `3px dotted hsl(${(index * 60) % 360
+                              }, 80%, 60%)`,
                             borderRadius: "50%",
                           }}
                         />
@@ -265,11 +264,10 @@ function MobileStory() {
                   </div>
                 </div>
                 <span
-                  className={`text-xs font-medium text-center max-w-[80px] leading-tight transition-all duration-200 ${
-                    clickedStory === story.id
-                      ? "text-rose-600 scale-95 font-semibold"
-                      : "text-gray-700 group-hover:text-rose-600 dark:text-gray-300"
-                  }`}
+                  className={`text-xs font-medium text-center max-w-[80px] leading-tight transition-all duration-200 ${clickedStory === story.id
+                    ? "text-rose-600 scale-95 font-semibold"
+                    : "text-gray-700 group-hover:text-rose-600 dark:text-gray-300"
+                    }`}
                 >
                   {story.title}
                 </span>
@@ -718,28 +716,34 @@ export default function HomePage() {
                     return (
                       <div
                         key={item.id}
-                        className={`flex-shrink-0 w-[80%] mx-[0.5%] h-full rounded-xl shadow-2xl bg-white dark:bg-gray-800 relative transition-all duration-700 ${
-                          isCurrent
-                            ? "scale-100 opacity-100 z-20"
-                            : "scale-90 opacity-70 z-10"
-                        }`}
+                        className={`flex-shrink-0 w-[80%] mx-[0.5%] h-full rounded-xl shadow-2xl bg-white dark:bg-gray-800 relative transition-all duration-700 ${isCurrent
+                          ? "scale-100 opacity-100 z-20"
+                          : "scale-90 opacity-70 z-10"
+                          }`}
                       >
                         {/* Content inside each slide */}
+                        {/* In the slider section, update the image rendering to handle videos */}
                         <div className="relative w-full h-full">
-                          <img
-                            src={
-                              item.image ||
-                              "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-KYjYNWgq9ZOTDy2FmxPPT4ubRgGJcp.png" || // Use the provided reference image as default
-                              "/placeholder.svg"
-                            }
-                            alt={item.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src =
-                                "/placeholder.svg?height=450&width=800&text=Image+Error"; // Fallback on error
-                            }}
-                          />
+                          {item.image.match(/\.(mp4|webm|ogg)$/i) ? (
+                            <video
+                              src={item.image}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              autoPlay
+                              loop
+                              playsInline
+                              controls
+                            />
+                          ) : (
+                            <img
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.title}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = "/placeholder.svg?height=450&width=800&text=Image+Error";
+                              }}
+                            />
+                          )}
                           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20" />
                         </div>
                       </div>
@@ -754,11 +758,10 @@ export default function HomePage() {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      index === currentSlide
-                        ? "bg-white scale-125"
-                        : "bg-white/50 hover:bg-white/80"
-                    }`}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
+                      ? "bg-white scale-125"
+                      : "bg-white/50 hover:bg-white/80"
+                      }`}
                   />
                 ))}
               </div>
@@ -771,37 +774,49 @@ export default function HomePage() {
               {slidesToShow.map((item, index) => (
                 <div
                   key={item.id}
-                  className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                    index === currentSlide
-                      ? "opacity-100 z-10"
-                      : "opacity-0 z-0"
-                  }`}
+                  className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide
+                    ? "opacity-100 z-10"
+                    : "opacity-0 z-0"
+                    }`}
                 >
-                  <div className="relative w-full h-full">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:from-black/80" />
+                  <div className="relative flex justify-center items-center w-full">
+                    <div className="relative aspect-[9/16] max-w-[400px] w-full bg-black overflow-hidden rounded-lg">
+                      {item.image.match(/\.(mp4|webm|ogg)$/i) ? (
+                        <video
+                          src={item.image}
+                          className="w-full h-full object-contain bg-black"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.title}
+                          className="w-full h-full object-contain bg-black"
+                        />
+                      )}
 
-                    <div className="absolute z-20 bottom-8 left-4 right-4 text-white text-center">
-                      <h1 className="text-2xl font-light leading-tight mb-2">
-                        {item.title}
-                      </h1>
-                      <p className="text-sm mb-4 opacity-90 font-light">
-                        {item.subtitle}
-                      </p>
-                      <Link href={item.link || "#"}>
-                        <Button
-                          size="sm"
-                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                        >
-                          Shop Now
-                        </Button>
-                      </Link>
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:from-black/80" />
+
+                      {/* Text Content */}
+                      <div className="absolute z-20 bottom-8 left-4 right-4 text-white text-center">
+                        <h1 className="text-2xl font-light leading-tight mb-2">{item.title}</h1>
+                        <p className="text-sm mb-4 opacity-90 font-light">{item.subtitle}</p>
+                        <Link href={item.link || "#"}>
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                          >
+                            Shop Now
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
+
                 </div>
               ))}
 
@@ -811,9 +826,8 @@ export default function HomePage() {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentSlide ? "bg-white" : "bg-white/50"
-                    }`}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-white" : "bg-white/50"
+                      }`}
                   />
                 ))}
               </div>
@@ -1187,13 +1201,12 @@ export default function HomePage() {
               >
                 <div
                   className={`bg-gradient-to-br w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg
-                  ${
-                    index === 0
+                  ${index === 0
                       ? "from-amber-500 to-yellow-600"
                       : index === 1
                         ? "from-blue-500 to-indigo-600"
                         : "from-purple-500 to-pink-600"
-                  }`}
+                    }`}
                 >
                   {item.icon}
                 </div>
@@ -1265,15 +1278,14 @@ export default function HomePage() {
               >
                 <div
                   className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl
-                  ${
-                    index === 0
+                  ${index === 0
                       ? "bg-gradient-to-br from-red-500 to-rose-600"
                       : index === 1
                         ? "bg-gradient-to-br from-amber-500 to-yellow-600"
                         : index === 2
                           ? "bg-gradient-to-br from-green-500 to-emerald-600"
                           : "bg-gradient-to-br from-purple-500 to-indigo-600"
-                  }`}
+                    }`}
                 >
                   {feature.icon}
                 </div>

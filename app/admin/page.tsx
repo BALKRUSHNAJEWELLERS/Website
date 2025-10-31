@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Edit, Plus, Save, Upload, Link } from "lucide-react" // Added Link icon
+import { Trash2, Edit, Plus, Save, Upload, Link, Image, Video } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { v4 as uuidv4 } from 'uuid'
 
@@ -20,10 +20,11 @@ interface MetalRate {
 
 interface SliderItem {
     id: string
-    image: string // This will store the URL after upload or pasted link
+    image: string
     title: string
     subtitle: string
     link: string
+    type?: 'image' | 'video'
 }
 
 interface Product {
@@ -31,11 +32,12 @@ interface Product {
     name: string
     category: string
     price: number
-    image: string // This will store the URL after upload or pasted link
+    image: string
     metal: string
     purity: string
     weight: string
     inStock: boolean
+    type?: 'image' | 'video'
 }
 
 export default function AdminPage() {
@@ -55,6 +57,10 @@ export default function AdminPage() {
     // State for image handling mode
     const [useSliderImageLink, setUseSliderImageLink] = useState(false)
     const [useProductImageLink, setUseProductImageLink] = useState(false)
+
+    // State for media type
+    const [sliderMediaType, setSliderMediaType] = useState<'image' | 'video'>('image')
+    const [productMediaType, setProductMediaType] = useState<'image' | 'video'>('image')
 
     // State for selected file objects
     const [selectedSliderFile, setSelectedSliderFile] = useState<File | null>(null)
@@ -136,20 +142,31 @@ export default function AdminPage() {
     const startEditingSlider = (item: SliderItem | null) => {
         setEditingSlider(item)
         setSelectedSliderFile(null) // Clear file selection on new edit
-        // Determine initial mode based on existing image URL
-        if (item?.image && !item.image.startsWith('/uploads/')) {
-            setUseSliderImageLink(true); // If it's a non-uploaded URL, default to link mode
+        
+        // Determine initial type and mode based on existing media URL
+        if (item?.image) {
+            if (item.image.match(/\.(mp4|webm|ogg)$/i)) {
+                setSliderMediaType('video')
+                setUseSliderImageLink(true)
+            } else if (!item.image.startsWith('/uploads/')) {
+                setUseSliderImageLink(true)
+                setSliderMediaType('image')
+            } else {
+                setUseSliderImageLink(false)
+                setSliderMediaType('image')
+            }
         } else {
-            setUseSliderImageLink(false); // Otherwise, default to upload mode
+            setUseSliderImageLink(false)
+            setSliderMediaType('image')
         }
     }
-
 
     const saveSliderItem = async (item: SliderItem) => {
         const formData = new FormData()
         formData.append("title", item.title)
         formData.append("subtitle", item.subtitle)
         formData.append("link", item.link)
+        formData.append("type", sliderMediaType)
 
         // For existing items, ensure ID is present. For new, generate.
         const currentId = item.id || uuidv4();
@@ -177,6 +194,7 @@ export default function AdminPage() {
                 setEditingSlider(null)
                 setSelectedSliderFile(null)
                 setUseSliderImageLink(false) // Reset mode
+                setSliderMediaType('image') // Reset type
                 toast({ title: "Success", description: `Slider item ${item.id ? "updated" : "created"}` })
             } else {
                 const errorData = await response.json();
@@ -190,7 +208,7 @@ export default function AdminPage() {
     const deleteSliderItem = async (id: string) => {
         setDeletingSliderId(id)
         try {
-            const response = await fetch(`/api/admin/slider?id=${id}`, { method: "DELETE" }) // Use query param for DELETE
+            const response = await fetch(`/api/admin/slider?id=${id}`, { method: "DELETE" })
             if (response.ok) {
                 await loadData()
                 toast({ title: "Success", description: "Slider item deleted successfully" })
@@ -226,11 +244,22 @@ export default function AdminPage() {
     const startEditingProduct = (product: Product | null) => {
         setEditingProduct(product)
         setSelectedProductFile(null) // Clear file selection on new edit
-        // Determine initial mode based on existing image URL
-        if (product?.image && !product.image.startsWith('/uploads/')) {
-            setUseProductImageLink(true); // If it's a non-uploaded URL, default to link mode
+        
+        // Determine initial type and mode based on existing media URL
+        if (product?.image) {
+            if (product.image.match(/\.(mp4|webm|ogg)$/i)) {
+                setProductMediaType('video')
+                setUseProductImageLink(true)
+            } else if (!product.image.startsWith('/uploads/')) {
+                setUseProductImageLink(true)
+                setProductMediaType('image')
+            } else {
+                setUseProductImageLink(false)
+                setProductMediaType('image')
+            }
         } else {
-            setUseProductImageLink(false); // Otherwise, default to upload mode
+            setUseProductImageLink(false)
+            setProductMediaType('image')
         }
     }
 
@@ -243,6 +272,7 @@ export default function AdminPage() {
         formData.append("purity", product.purity)
         formData.append("weight", product.weight)
         formData.append("inStock", product.inStock.toString())
+        formData.append("type", productMediaType)
 
         const currentId = product.id || uuidv4();
         formData.append("id", currentId);
@@ -256,7 +286,6 @@ export default function AdminPage() {
             return;
         }
 
-
         try {
             const method = product.id ? "PUT" : "POST"
             const response = await fetch("/api/admin/products", {
@@ -269,6 +298,7 @@ export default function AdminPage() {
                 setEditingProduct(null)
                 setSelectedProductFile(null)
                 setUseProductImageLink(false) // Reset mode
+                setProductMediaType('image') // Reset type
                 toast({ title: "Success", description: `Product ${product.id ? "updated" : "created"}` })
             } else {
                 const errorData = await response.json();
@@ -282,7 +312,7 @@ export default function AdminPage() {
     const deleteProduct = async (id: string) => {
         setDeletingProductId(id)
         try {
-            const response = await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" }) // Use query param for DELETE
+            const response = await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" })
             if (response.ok) {
                 await loadData()
                 toast({ title: "Success", description: "Product deleted successfully" })
@@ -304,6 +334,10 @@ export default function AdminPage() {
         }).format(new Date(dateString))
     }
 
+    // Helper function to detect media type for display
+    const getMediaType = (url: string): 'image' | 'video' => {
+        return url.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image'
+    }
 
     if (showPasswordPrompt) {
         return (
@@ -376,19 +410,46 @@ export default function AdminPage() {
                         </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {sliderItems.map((item) => (
-                            <Card key={item.id}>
-                                <CardContent className="p-4">
-                                    <img src={item.image} alt={item.title} className="w-full h-40 object-cover mb-2 rounded" />
-                                    <h3 className="font-semibold">{item.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{item.subtitle}</p>
-                                    <div className="flex gap-2 mt-2">
-                                        <Button variant="outline" size="sm" onClick={() => startEditingSlider(item)}><Edit className="w-4 h-4" /></Button>
-                                        <Button variant="outline" size="sm" onClick={() => deleteSliderItem(item.id)} disabled={deletingSliderId === item.id}><Trash2 className="w-4 h-4" /></Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                        {sliderItems.map((item) => {
+                            const mediaType = getMediaType(item.image);
+                            return (
+                                <Card key={item.id}>
+                                    <CardContent className="p-4">
+                                        <div className={`mb-2 rounded overflow-hidden ${
+                                            mediaType === 'video' 
+                                                ? 'aspect-[9/16] h-64' // 9:16 aspect ratio for videos
+                                                : 'aspect-video h-40' // 16:9 aspect ratio for images
+                                        }`}>
+                                            {mediaType === 'video' ? (
+                                                <video
+                                                    src={item.image}
+                                                    className="w-full h-full object-cover"
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                />
+                                            ) : (
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.title} 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            )}
+                                        </div>
+                                        <h3 className="font-semibold">{item.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+                                        <div className="flex gap-2 mt-2">
+                                            <Button variant="outline" size="sm" onClick={() => startEditingSlider(item)}>
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => deleteSliderItem(item.id)} disabled={deletingSliderId === item.id}>
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                     {editingSlider && (
                         <Card className="mt-6 border border-orange-500">
@@ -398,13 +459,36 @@ export default function AdminPage() {
                                 <Input placeholder="Subtitle" value={editingSlider.subtitle} onChange={(e) => setEditingSlider({ ...editingSlider, subtitle: e.target.value })} />
                                 <Input placeholder="Link" value={editingSlider.link} onChange={(e) => setEditingSlider({ ...editingSlider, link: e.target.value })} />
 
-                                {/* Image Upload / Link for Slider */}
+                                {/* Media Upload / Link for Slider */}
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 mb-2">
+                                        {/* Media Type Selection */}
+                                        <div className="flex gap-2 mr-4">
+                                            <Button
+                                                variant={sliderMediaType === 'image' ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setSliderMediaType('image')}
+                                            >
+                                                <Image className="w-4 h-4 mr-2" /> Image
+                                            </Button>
+                                            <Button
+                                                variant={sliderMediaType === 'video' ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setSliderMediaType('video')}
+                                            >
+                                                <Video className="w-4 h-4 mr-2" /> Video
+                                            </Button>
+                                        </div>
+                                        
+                                        {/* Upload/Link Selection */}
                                         <Button
                                             variant={useSliderImageLink ? "outline" : "default"}
                                             size="sm"
-                                            onClick={() => { setUseSliderImageLink(false); setSelectedSliderFile(null); if(editingSlider) setEditingSlider({...editingSlider, image: editingSlider.image.startsWith('/uploads/') ? editingSlider.image : ""}) }}
+                                            onClick={() => { 
+                                                setUseSliderImageLink(false); 
+                                                setSelectedSliderFile(null); 
+                                                if(editingSlider) setEditingSlider({...editingSlider, image: editingSlider.image.startsWith('/uploads/') ? editingSlider.image : ""}) 
+                                            }}
                                         >
                                             <Upload className="w-4 h-4 mr-2" /> Upload File
                                         </Button>
@@ -413,21 +497,21 @@ export default function AdminPage() {
                                             size="sm"
                                             onClick={() => { setUseSliderImageLink(true); setSelectedSliderFile(null); }}
                                         >
-                                            <Link className="w-4 h-4 mr-2" /> Use Image Link
+                                            <Link className="w-4 h-4 mr-2" /> Use Link
                                         </Button>
                                     </div>
 
                                     {useSliderImageLink ? (
                                         <Input
-                                            placeholder="Image URL"
+                                            placeholder={sliderMediaType === 'image' ? "Image URL" : "Video URL"}
                                             value={editingSlider.image}
                                             onChange={handleSliderImageLinkChange}
                                         />
                                     ) : (
                                         <Input
-                                            id="slider-image-upload"
+                                            id="slider-media-upload"
                                             type="file"
-                                            accept="image/*"
+                                            accept={sliderMediaType === 'image' ? "image/*" : "video/*"}
                                             onChange={handleSliderImageFileChange}
                                             className="w-full"
                                         />
@@ -446,21 +530,35 @@ export default function AdminPage() {
                                             </Badge>
                                         )}
                                     </div>
-                                    {/* Image Preview */}
+                                    {/* Media Preview */}
                                     {(selectedSliderFile || editingSlider.image) && (
                                         <div className="mt-2">
-                                            <img
-                                                src={selectedSliderFile ? URL.createObjectURL(selectedSliderFile) : editingSlider.image}
-                                                alt="Preview"
-                                                className="w-32 h-32 object-cover rounded border"
-                                            />
+                                            {sliderMediaType === 'image' ? (
+                                                <img
+                                                    src={selectedSliderFile ? URL.createObjectURL(selectedSliderFile) : editingSlider.image}
+                                                    alt="Preview"
+                                                    className="w-32 h-32 object-cover rounded border"
+                                                />
+                                            ) : (
+                                                <video
+                                                    src={selectedSliderFile ? URL.createObjectURL(selectedSliderFile) : editingSlider.image}
+                                                    className="w-32 h-32 object-cover rounded border"
+                                                    controls
+                                                    muted
+                                                />
+                                            )}
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button onClick={() => saveSliderItem(editingSlider)}><Save className="w-4 h-4 mr-2" /> Save</Button>
-                                    <Button variant="outline" onClick={() => { setEditingSlider(null); setSelectedSliderFile(null); setUseSliderImageLink(false); }}>Cancel</Button>
+                                    <Button variant="outline" onClick={() => { 
+                                        setEditingSlider(null); 
+                                        setSelectedSliderFile(null); 
+                                        setUseSliderImageLink(false); 
+                                        setSliderMediaType('image');
+                                    }}>Cancel</Button>
                                 </div>
                             </CardContent>
                         </Card>
@@ -476,21 +574,44 @@ export default function AdminPage() {
                         </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {products.map((product) => (
-                            <Card key={product.id}>
-                                <CardContent className="p-4">
-                                    <img src={product.image} alt={product.name} className="w-full h-40 object-cover mb-2 rounded" />
-                                    <h3 className="font-semibold">{product.name}</h3>
-                                    <p className="text-sm text-muted-foreground">{product.category} - ₹{product.price}</p>
-                                    <p className="text-sm">{product.metal} ({product.purity}), {product.weight}</p>
-                                    <Badge className="mt-1" variant={product.inStock ? "default" : "secondary"}>{product.inStock ? "In Stock" : "Out of Stock"}</Badge>
-                                    <div className="flex gap-2 mt-2">
-                                        <Button variant="outline" size="sm" onClick={() => startEditingProduct(product)}><Edit className="w-4 h-4" /></Button>
-                                        <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)} disabled={deletingProductId === product.id}><Trash2 className="w-4 h-4" /></Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                        {products.map((product) => {
+                            const mediaType = getMediaType(product.image);
+                            return (
+                                <Card key={product.id}>
+                                    <CardContent className="p-4">
+                                        <div className={`w-full mb-2 rounded overflow-hidden ${
+                                            mediaType === 'video' 
+                                                ? 'aspect-[9/16] h-64' // 9:16 aspect ratio for videos
+                                                : 'aspect-square h-40' // Square aspect ratio for product images
+                                        }`}>
+                                            {mediaType === 'video' ? (
+                                                <video
+                                                    src={product.image}
+                                                    className="w-full h-full object-cover"
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                />
+                                            ) : (
+                                                <img 
+                                                    src={product.image} 
+                                                    alt={product.name} 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            )}
+                                        </div>
+                                        <h3 className="font-semibold">{product.name}</h3>
+                                        <p className="text-sm text-muted-foreground">{product.category} - ₹{product.price}</p>
+                                        <p className="text-sm">{product.metal} ({product.purity}), {product.weight}</p>
+                                        <Badge className="mt-1" variant={product.inStock ? "default" : "secondary"}>{product.inStock ? "In Stock" : "Out of Stock"}</Badge>
+                                        <div className="flex gap-2 mt-2">
+                                            <Button variant="outline" size="sm" onClick={() => startEditingProduct(product)}><Edit className="w-4 h-4" /></Button>
+                                            <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)} disabled={deletingProductId === product.id}><Trash2 className="w-4 h-4" /></Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                     {editingProduct && (
                         <Card className="mt-6 border border-orange-500">
@@ -505,13 +626,36 @@ export default function AdminPage() {
                                     <Input placeholder="Weight" value={editingProduct.weight} onChange={(e) => setEditingProduct({ ...editingProduct, weight: e.target.value })} />
                                 </div>
 
-                                {/* Image Upload / Link for Product */}
+                                {/* Media Upload / Link for Product */}
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 mb-2">
+                                        {/* Media Type Selection */}
+                                        <div className="flex gap-2 mr-4">
+                                            <Button
+                                                variant={productMediaType === 'image' ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setProductMediaType('image')}
+                                            >
+                                                <Image className="w-4 h-4 mr-2" /> Image
+                                            </Button>
+                                            <Button
+                                                variant={productMediaType === 'video' ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setProductMediaType('video')}
+                                            >
+                                                <Video className="w-4 h-4 mr-2" /> Video
+                                            </Button>
+                                        </div>
+                                        
+                                        {/* Upload/Link Selection */}
                                         <Button
                                             variant={useProductImageLink ? "outline" : "default"}
                                             size="sm"
-                                            onClick={() => { setUseProductImageLink(false); setSelectedProductFile(null); if(editingProduct) setEditingProduct({...editingProduct, image: editingProduct.image.startsWith('/uploads/') ? editingProduct.image : ""}) }}
+                                            onClick={() => { 
+                                                setUseProductImageLink(false); 
+                                                setSelectedProductFile(null); 
+                                                if(editingProduct) setEditingProduct({...editingProduct, image: editingProduct.image.startsWith('/uploads/') ? editingProduct.image : ""}) 
+                                            }}
                                         >
                                             <Upload className="w-4 h-4 mr-2" /> Upload File
                                         </Button>
@@ -520,21 +664,21 @@ export default function AdminPage() {
                                             size="sm"
                                             onClick={() => { setUseProductImageLink(true); setSelectedProductFile(null); }}
                                         >
-                                            <Link className="w-4 h-4 mr-2" /> Use Image Link
+                                            <Link className="w-4 h-4 mr-2" /> Use Link
                                         </Button>
                                     </div>
 
                                     {useProductImageLink ? (
                                         <Input
-                                            placeholder="Image URL"
+                                            placeholder={productMediaType === 'image' ? "Image URL" : "Video URL"}
                                             value={editingProduct.image}
                                             onChange={handleProductImageLinkChange}
                                         />
                                     ) : (
                                         <Input
-                                            id="product-image-upload"
+                                            id="product-media-upload"
                                             type="file"
-                                            accept="image/*"
+                                            accept={productMediaType === 'image' ? "image/*" : "video/*"}
                                             onChange={handleProductImageFileChange}
                                             className="w-full"
                                         />
@@ -553,14 +697,23 @@ export default function AdminPage() {
                                             </Badge>
                                         )}
                                     </div>
-                                    {/* Image Preview */}
+                                    {/* Media Preview */}
                                     {(selectedProductFile || editingProduct.image) && (
                                         <div className="mt-2">
-                                            <img
-                                                src={selectedProductFile ? URL.createObjectURL(selectedProductFile) : editingProduct.image}
-                                                alt="Preview"
-                                                className="w-32 h-32 object-cover rounded border"
-                                            />
+                                            {productMediaType === 'image' ? (
+                                                <img
+                                                    src={selectedProductFile ? URL.createObjectURL(selectedProductFile) : editingProduct.image}
+                                                    alt="Preview"
+                                                    className="w-32 h-32 object-cover rounded border"
+                                                />
+                                            ) : (
+                                                <video
+                                                    src={selectedProductFile ? URL.createObjectURL(selectedProductFile) : editingProduct.image}
+                                                    className="w-32 h-32 object-cover rounded border"
+                                                    controls
+                                                    muted
+                                                />
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -571,7 +724,12 @@ export default function AdminPage() {
                                 </div>
                                 <div className="flex gap-2">
                                     <Button onClick={() => saveProduct(editingProduct)}><Save className="w-4 h-4 mr-2" /> Save</Button>
-                                    <Button variant="outline" onClick={() => { setEditingProduct(null); setSelectedProductFile(null); setUseProductImageLink(false); }}>Cancel</Button>
+                                    <Button variant="outline" onClick={() => { 
+                                        setEditingProduct(null); 
+                                        setSelectedProductFile(null); 
+                                        setUseProductImageLink(false); 
+                                        setProductMediaType('image');
+                                    }}>Cancel</Button>
                                 </div>
                             </CardContent>
                         </Card>

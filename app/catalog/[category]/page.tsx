@@ -130,15 +130,27 @@ export default function CategoryPage() {
               key={product.id}
               className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white dark:bg-gray-800 border-0 shadow-sm overflow-hidden"
             >
+           // Update the product image rendering in the category page
               <div className="relative overflow-hidden">
                 <div className="aspect-square overflow-hidden">
-                  <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    width={250}
-                    height={250}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  {product.image && product.image.match(/\.(mp4|webm|ogg)$/i) ? (
+                    <video
+                      src={product.image}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : (
+                    <Image
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      width={250}
+                      height={250}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
                 </div>
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
               </div>
