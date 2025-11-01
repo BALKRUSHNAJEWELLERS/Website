@@ -1,39 +1,42 @@
-import * as fs from 'fs/promises'; // Use fs/promises for async operations
-import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid'; // Make sure uuid is installed
+import fs from 'fs/promises'
+import path from 'path'
 
-export const deleteImageFile = async (imageUrl: string): Promise<void> => {
-    if (!imageUrl || !imageUrl.startsWith('/uploads/')) {
-        return; // Only delete files uploaded to our /public/uploads directory
-    }
-    const filePath = path.join(process.cwd(), 'public', imageUrl);
-    try {
-        await fs.unlink(filePath);
-        console.log(`Deleted image file: ${filePath}`);
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-            console.warn(`Attempted to delete non-existent file: ${filePath}`);
-        } else {
-            console.error(`Error deleting image file ${filePath}:`, error);
-        }
-    }
-};
+export async function saveMediaFile(file: File): Promise<string> {
+  try {
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    
+    // Create uploads directory if it doesn't exist
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
+    await fs.mkdir(uploadsDir, { recursive: true })
+    
+    // Generate unique filename
+    const timestamp = Date.now()
+    const originalName = file.name.replace(/[^a-zA-Z0-9.]/g, '')
+    const filename = `${timestamp}-${originalName}`
+    const filepath = path.join(uploadsDir, filename)
+    
+    // Write file
+    await fs.writeFile(filepath, buffer)
+    
+    return `/uploads/${filename}`
+  } catch (error) {
+    console.error('Error saving media file:', error)
+    throw new Error('Failed to save media file')
+  }
+}
 
-export const saveImageFile = async (file: File): Promise<string> => {
-    // Generate a unique file name
-    const uniqueFileName = `${uuidv4()}${path.extname(file.name)}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    const filePath = path.join(uploadDir, uniqueFileName);
+// Keep existing deleteImageFile function, it should work for videos too
+export async function deleteImageFile(filePath: string): Promise<void> {
+  try {
+    const filename = path.basename(filePath)
+    const fullPath = path.join(process.cwd(), 'public', 'uploads', filename)
+    await fs.unlink(fullPath)
+  } catch (error) {
+    console.error('Error deleting file:', error)
+    // Don't throw error for delete failures
+  }
+}
 
-    // Ensure the upload directory exists
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Read the file content as an ArrayBuffer, then convert to Node.js Buffer
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Write the buffer to the file system
-    await fs.writeFile(filePath, buffer);
-
-    // Return the public URL path
-    return `/uploads/${uniqueFileName}`;
-};
+// Keep saveImageFile for backward compatibility
+export { saveMediaFile as saveImageFile }

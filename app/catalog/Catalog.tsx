@@ -404,11 +404,10 @@ export default function CatalogPage() {
                           onClick={() =>
                             toggleFilter(selectedCategory, filterKey, opt)
                           }
-                          className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 ${
-                            isActive
-                              ? "bg-amber-500 text-white border-amber-500 font-semibold shadow-sm"
-                              : "bg-white text-stone-600 border-stone-300 hover:border-amber-400 hover:text-amber-600"
-                          }`}
+                          className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 ${isActive
+                            ? "bg-amber-500 text-white border-amber-500 font-semibold shadow-sm"
+                            : "bg-white text-stone-600 border-stone-300 hover:border-amber-400 hover:text-amber-600"
+                            }`}
                         >
                           {opt}
                         </button>
@@ -469,11 +468,14 @@ export default function CatalogPage() {
             </div>
           ) : (
             <>
-              <section className="text-center mb-8 w-92">
-                <h2 className="inline-block pb-1 select-none text-amber-600 font-semibold tracking-wide text-5xl">
-                  ≿━━━━༺❀༻━━━━≾ Collections ≿━━━━༺❀༻━━━━≾
+              <section className="text-center mb-8 w-full flex items-center justify-center">
+                <div className="flex-grow h-px bg-amber-400 max-w-[200px] sm:max-w-[400px]"></div>
+                <h2 className="px-4 text-amber-600 font-semibold tracking-wide text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif">
+                  Collections
                 </h2>
+                <div className="flex-grow h-px bg-amber-400 max-w-[200px] sm:max-w-[400px]"></div>
               </section>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filteredProducts.map((product) => (
                   <article
@@ -481,18 +483,25 @@ export default function CatalogPage() {
                     className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col"
                     style={{ minHeight: "320px", maxHeight: "370px" }}
                   >
+                    {/* // Update the product card to handle videos */}
                     <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-stone-50">
-                      <Image
-                        src={
-                          product.image ||
-                          `/placeholder.svg?height=300&width=300&query=${
-                            product.category || "/placeholder.svg"
-                          } jewelry`
-                        }
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                      {product.image && product.image.match(/\.(mp4|webm|ogg)$/i) ? (
+                        <video
+                          src={product.image}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          autoPlay
+                          controls
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        <Image
+                          src={product.image || `/placeholder.svg?height=300&width=300&query=${product.category || ""} jewelry`}
+                          alt={product.name}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      )}
                     </div>
 
                     <div className="p-4 bg-white text-center">

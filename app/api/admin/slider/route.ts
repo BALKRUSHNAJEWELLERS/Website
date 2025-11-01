@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '../../../../lib/mongodb';
 import { SliderItemDoc } from '../../../../types';
-import { deleteImageFile, saveImageFile } from '../../../../lib/image-utils';
+import { deleteImageFile, saveImageFile, saveMediaFile } from "../../../../lib/image-utils"
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET() {
@@ -33,9 +33,9 @@ export async function POST(request: Request) {
         let imageUrl: string = '';
 
         if (file) {
-            imageUrl = await saveImageFile(file); // If a file is uploaded, save it
+            imageUrl = await saveMediaFile(file); // This should handle both images and videos
         } else if (imageLink) {
-            imageUrl = imageLink; // If no file, use the provided link
+            imageUrl = imageLink;
         } else {
             return NextResponse.json({ error: 'Please provide an image by uploading a file or pasting a link.' }, { status: 400 });
         }

@@ -95,13 +95,13 @@ export function Navbar() {
             <div className="hidden md:block">
               {" "}
               <div className="flex flex-col">
-                 {" "}
+                {" "}
                 <span className="text-xl font-bold text-slate-800 dark:text-slate-100 transition-colors duration-300">
-                    BALKRUSHNA  {" "}
+                  BALKRUSHNA  {" "}
                 </span>
-                 {" "}
+                {" "}
                 <div className="text-xs text-amber-600 dark:text-amber-500 font-semibold tracking-widest">
-                    JEWELLERS  {" "}
+                  JEWELLERS  {" "}
                 </div>
                 {" "}
               </div>
@@ -117,19 +117,17 @@ export function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 group ${
-                    isActive
-                      ? "text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20"
-                      : "text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-slate-800"
-                  }`}
+                  className={`relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 group ${isActive
+                    ? "text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20"
+                    : "text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-slate-800"
+                    }`}
                 >
                   {item.name}
                   <span
-                    className={`absolute bottom-0 left-0 w-full h-[2px] bg-amber-600 dark:bg-amber-500 transform transition-transform duration-300 origin-left ${
-                      isActive
-                        ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
-                    }`}
+                    className={`absolute bottom-0 left-0 w-full h-[2px] bg-amber-600 dark:bg-amber-500 transform transition-transform duration-300 origin-left ${isActive
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
+                      }`}
                   ></span>
                 </Link>
               );
@@ -179,23 +177,53 @@ export function Navbar() {
                   <Link
                     href="/"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center space-x-3"
+                    className="flex items-center space-x-3 group"
                   >
-                    <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center shadow-md">
-                      <span className="text-amber-400 font-bold text-xl tracking-tighter">
-                        BKJ
+                    <div
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        background: "#191c20",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "relative",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: "5%",
+                          border: "2.5px solid #d4af37",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      <span
+                        style={{
+                          color: "#d4af37",
+                          fontFamily: "'Georgia', 'Times New Roman', serif",
+                          fontWeight: 500,
+                          fontSize: "23px",
+                          letterSpacing: "0.02em",
+                          zIndex: 1,
+                          textTransform: "lowercase",
+                        }}
+                      >
+                        bkj
                       </span>
                     </div>
                     <div>
-                      <span className="text-xl font-bold text-white">
-                        BALKRUSHNA
-                      </span>
+                      <span className="text-xl font-bold text-white">BALKRUSHNA</span>
                       <div className="text-xs text-amber-500 font-semibold tracking-widest">
                         JEWELLERS
                       </div>
                     </div>
                   </Link>
                 </div>
+
+
 
                 {/* Mobile Navigation Items */}
                 <div className="flex flex-col gap-2 flex-grow">
@@ -207,18 +235,16 @@ export function Navbar() {
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 text-base font-medium group ${
-                          isActive
-                            ? "bg-amber-500/20 text-amber-400 border-l-4 border-amber-500"
-                            : "hover:bg-slate-800/60 text-slate-200"
-                        }`}
+                        className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 text-base font-medium group ${isActive
+                          ? "bg-amber-500/20 text-amber-400 border-l-4 border-amber-500"
+                          : "hover:bg-slate-800/60 text-slate-200"
+                          }`}
                       >
                         <Icon
-                          className={`w-5 h-5 transition-colors duration-200 ${
-                            isActive
-                              ? "text-amber-500"
-                              : "text-amber-500/80 group-hover:text-amber-500"
-                          }`}
+                          className={`w-5 h-5 transition-colors duration-200 ${isActive
+                            ? "text-amber-500"
+                            : "text-amber-500/80 group-hover:text-amber-500"
+                            }`}
                         />
                         <span>{item.name}</span>
                       </Link>

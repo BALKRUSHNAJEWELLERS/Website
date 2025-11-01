@@ -19,16 +19,11 @@ import {
   TrendingUp,
   Banknote,
   Gem,
-  Download, // Changed Printer to Download icon
-  Gift,
 } from "lucide-react";
-// Removed useReactToPrint
-// import { useReactToPrint } from "react-to-print";
-import { motion } from "framer-motion";
 
-// Import html2canvas and jspdf
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface Scheme {
   name: string;
@@ -41,87 +36,73 @@ interface Scheme {
   color: string;
   popular: boolean;
   rules: string;
+  image?: string; // ✅ optional so others don't need it
 }
 
 export default function GoldSchemeSingleCard() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const componentRef = useRef<HTMLDivElement>(null); // This ref will point to the content to be converted to PDF
-
-  // Removed handlePrint from useReactToPrint
-  // const handlePrint = useReactToPrint({
-  //   content: () => componentRef.current,
-  //   documentTitle: 'Gold Scheme Details',
-  //   removeAfterPrint: true,
-  // });
+  const componentRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadPdf = async () => {
     const element = componentRef.current;
     if (element) {
-      // Temporarily hide the print/download button and any other elements not meant for the PDF
-      const printHiddenElements = element.querySelectorAll('.print\\:hidden');
-      printHiddenElements.forEach(el => (el as HTMLElement).style.display = 'none');
+      const printHiddenElements = element.querySelectorAll(".print\\:hidden");
+      printHiddenElements.forEach(
+        (el) => ((el as HTMLElement).style.display = "none")
+      );
 
       const canvas = await html2canvas(element, {
-        scale: 2, // Increase scale for better quality PDF
-        useCORS: true, // If you have images from other origins
+        scale: 2,
+        useCORS: true,
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' size
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
 
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
-      pdf.save('gold_scheme_details.pdf');
+      pdf.save("gold_scheme_details.pdf");
 
-      // Restore the visibility of hidden elements
-      printHiddenElements.forEach(el => (el as HTMLElement).style.display = '');
+      printHiddenElements.forEach(
+        (el) => ((el as HTMLElement).style.display = "")
+      );
     }
   };
 
   const schemes: Scheme[] = [
     {
-      name: "Suvarna Dar Savings Scheme",
-      duration: "12 Months",
-      monthlyAmount: "₹1,000",
-      totalAmount: "₹12,000",
-      goldValue: "₹13,200",
-      discount: "10%",
+      name: "Suvarn Dar Bachat Yojana",
+      duration: "6 to 24 Months",
+      monthlyAmount: "Variable Installments",
+      totalAmount: "See Installment Table",
+      goldValue: "Book Gold at Lower Price",
+      discount: "Save up to ₹1,07,000",
       features: [
-        "No making charges on all items",
-        "Free jewelry cleaning & polishing",
-        "Priority customer service",
-        "Flexible payment dates",
+        "Pre-book gold at a lower rate than today's market price.",
+        "Save a significant amount on your wedding purchase.",
+        "Protection from the daily rising price of gold.",
       ],
       color: "from-yellow-400 to-yellow-600",
       popular: true,
-      rules: `1. Redemption is allowed only for gold ornaments under this scheme.
-2. Once registered, scheme terms cannot be changed.
-3. Redemption is not permitted for any other BKJ schemes or silver items.
-4. Redemption is allowed only against a purchase at our showroom. No cash claims.
-5. Customers must redeem their account within 3 months of maturity. Redemption is allowed only during declared showroom hours.
-6. In case of any contact detail changes, inform the showroom within 7 days.
-7. Passbook is a required document for redemption, considered legal proof. It must be signed and well maintained.
-8. During redemption, the original passbook must be submitted, and amounts must match the entries.
-9. Passbook must be signed by both customer and showroom staff at registration.
-10. If passbook is lost, a duplicate can be issued with valid ID proof and a loss affidavit. A ₹100 fee will apply.
-11. Read all terms in the passbook carefully before joining the scheme and clarify doubts.
-12. Valid photo ID proof must be shown at redemption (DL, Passport, Ration Card, Voter ID, or PAN).
-13. Subject to Himatnagar jurisdiction.
-14. Any disputes will be resolved by arbitration; no legal claims should arise.`,
+      image: "/Suvarn Dar Bachat Yojan.jpeg", // ✅ path corrected (avoid spaces)
+      rules: `1. This scheme applies only to 22 Karat (916) Hallmark jewelry.
+2. GST and Making Charges (Mazdoori) must be paid separately at the time of purchase.
+3. It is compulsory to complete the entire decided installment plan.
+4. The full details, including the installment table and complete example, are available in the official scheme pamphlet (the uploaded image).`,
     },
     {
       name: "Suvarna Vrudhi Scheme",
@@ -184,7 +165,10 @@ export default function GoldSchemeSingleCard() {
   ];
 
   return (
-    <div ref={componentRef} className="p-4 sm:p-6 space-y-10 max-w-5xl mx-auto">
+    <div
+      ref={componentRef}
+      className="p-4 sm:p-6 space-y-10 max-w-5xl mx-auto"
+    >
       <div className="grid gap-6 sm:grid-cols-2">
         {schemes.map((scheme, index) => (
           <motion.div
@@ -222,6 +206,8 @@ export default function GoldSchemeSingleCard() {
                     per month / gold deposit
                   </div>
                 </div>
+
+                {/* Investment details */}
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-300 flex items-center gap-1">
@@ -246,6 +232,8 @@ export default function GoldSchemeSingleCard() {
                     </span>
                   </div>
                 </div>
+
+                {/* Features */}
                 <div className="space-y-2 mb-6">
                   {scheme.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start gap-2">
@@ -256,6 +244,8 @@ export default function GoldSchemeSingleCard() {
                     </div>
                   ))}
                 </div>
+
+                {/* Dialog */}
                 <Dialog
                   open={openIndex === index}
                   onOpenChange={(o) => setOpenIndex(o ? index : null)}
@@ -267,104 +257,48 @@ export default function GoldSchemeSingleCard() {
                       View Details
                     </Button>
                   </DialogTrigger>
+
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto border border-yellow-400 shadow-xl rounded-xl bg-white dark:bg-zinc-900">
                     <DialogHeader className="text-center">
                       <div className="flex flex-col items-center gap-2 mb-4">
                         <Info className="w-8 h-8 text-yellow-600" />
                         <DialogTitle className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
-                          Terms & Conditions
+                          {scheme.image
+                            ? "Scheme Pamphlet"
+                            : "Terms & Conditions"}
                         </DialogTitle>
                       </div>
                     </DialogHeader>
-                    <div className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 space-y-3 px-2">
-                      {scheme.rules.split("\n").map((line, ruleIdx) => (
-                        <p key={ruleIdx} className="flex gap-2 items-start">
-                          <span className="font-semibold text-yellow-600 dark:text-yellow-400">
-                            {line.split(".")[0]}.
-                          </span>
-                          <span>
-                            {line.substring(line.indexOf(".") + 1).trim()}
-                          </span>
-                        </p>
-                      ))}
-                    </div>
+
+                    {/* ✅ Conditional image or text */}
+                    {scheme.image ? (
+                      <div className="flex justify-center">
+                        <img
+                          src={scheme.image}
+                          alt={`${scheme.name} Details`}
+                          className="rounded-lg shadow-md max-w-full h-auto"
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 space-y-3 px-2">
+                        {scheme.rules.split("\n").map((line, ruleIdx) => (
+                          <p key={ruleIdx} className="flex gap-2 items-start">
+                            <span className="font-semibold text-yellow-600 dark:text-yellow-400">
+                              {line.split(".")[0]}.
+                            </span>
+                            <span>
+                              {line.substring(line.indexOf(".") + 1).trim()}
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
                   </DialogContent>
                 </Dialog>
               </CardContent>
             </Card>
           </motion.div>
         ))}
-      </div>
-
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-center mb-4">Compare Schemes</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-            <thead className="bg-yellow-100 dark:bg-zinc-800">
-              <tr>
-                <th className="px-4 py-2 text-left">Feature</th>
-                {schemes.map((scheme, idx) => (
-                  <th key={idx} className="px-4 py-2 text-left">
-                    {scheme.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-t">
-                <td className="px-4 py-2">Duration</td>
-                {schemes.map((s, i) => (
-                  <td key={i} className="px-4 py-2">
-                    {s.duration}
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2">Amount Type</td>
-                {schemes.map((s, i) => (
-                  <td key={i} className="px-4 py-2">
-                    {s.monthlyAmount}
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2">Total Investment</td>
-                {schemes.map((s, i) => (
-                  <td key={i} className="px-4 py-2">
-                    {s.totalAmount}
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2">Gold Return</td>
-                {schemes.map((s, i) => (
-                  <td key={i} className="px-4 py-2">
-                    {s.goldValue}
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-2">Bonus/Benefit</td>
-                {schemes.map((s, i) => (
-                  <td key={i} className="px-4 py-2">
-                    {s.discount}
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Download PDF Button */}
-      <div className="flex justify-center gap-4 pt-6 print:hidden">
-        <button
-          onClick={handleDownloadPdf} // Call the new PDF download function
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2 bg-yellow-500 text-white hover:bg-yellow-600 rounded-md text-sm font-medium shadow transition"
-        >
-          <Download className="w-4 h-4 mr-2" /> {/* Changed icon */}
-          Download PDF
-        </button>
       </div>
     </div>
   );
