@@ -130,7 +130,7 @@ export default function CategoryPage() {
               key={product.id}
               className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white dark:bg-gray-800 border-0 shadow-sm overflow-hidden"
             >
-           // Update the product image rendering in the category page
+            {/* Update the product image rendering in the category page */}
               <div className="relative overflow-hidden">
                 <div className="aspect-square overflow-hidden">
                   {product.image && product.image.match(/\.(mp4|webm|ogg)$/i) ? (
