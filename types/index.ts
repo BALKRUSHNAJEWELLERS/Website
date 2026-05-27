@@ -28,3 +28,22 @@ export interface ProductDoc {
     weight: string;
     inStock: boolean;
 }
+
+export interface GoldSchemeDoc {
+    _id?: string; // MongoDB document ID
+    id: string; // Your custom ID (uuidv4)
+    name: string;
+    duration: string;
+    monthlyAmount: string;
+    totalAmount: string;
+    goldValue: string;
+    discount: string;
+    features: string[];
+    color: string;
+    popular: boolean;
+    rules: string;
+    image?: string;
+    sortOrder?: number;
+    createdAt?: string;
+    updatedAt?: string;
+}

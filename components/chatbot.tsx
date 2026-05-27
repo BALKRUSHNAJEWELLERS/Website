@@ -5,7 +5,21 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation"; // Optional for smooth redirect in App Router
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, X, Send, Sparkles, Bot, User } from "lucide-react";
+import {
+  MessageSquare,
+  MessageCircle,
+  X,
+  Send,
+  Sparkles,
+  Bot,
+  User,
+} from "lucide-react";
+
+const WHATSAPP_NUMBER = "917600093017";
+const WHATSAPP_MESSAGE = "Hi, I want more info about this";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  WHATSAPP_MESSAGE
+)}`;
 
 const TypingIndicator = () => (
   <div className="flex items-center space-x-1 p-2">
@@ -175,9 +189,24 @@ export function ChatBot() {
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-3 sm:right-6 md:bottom-6">
+        <Button
+          asChild
+          className="rounded-full w-16 h-16 bg-green-500 hover:bg-green-600 text-white shadow-lg"
+        >
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Chat with Balkrushna Jewellers on WhatsApp"
+            title="Chat on WhatsApp"
+          >
+            <MessageCircle size={32} />
+          </a>
+        </Button>
         <Button
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close AI chatbot" : "Open AI chatbot"}
           className="rounded-full w-16 h-16 bg-amber-500 hover:bg-amber-600 text-white shadow-lg"
         >
           {isOpen ? <X size={32} /> : <MessageSquare size={32} />}
@@ -186,7 +215,7 @@ export function ChatBot() {
 
       {/* Chat UI */}
       {isOpen && (
-        <div className="fixed bottom-24 left-4 right-4 z-50 mx-auto w-auto max-w-sm sm:right-6 sm:left-auto">
+        <div className="fixed bottom-40 left-4 right-4 z-50 mx-auto w-auto max-w-sm sm:right-6 sm:left-auto md:bottom-24">
           <Card className="flex flex-col h-[60vh] rounded-2xl shadow-2xl bg-white dark:bg-zinc-900">
             <CardHeader className="bg-amber-500 p-4 rounded-t-2xl text-white">
               <div className="flex items-center gap-3">
