@@ -4,6 +4,7 @@ import { useState, useEffect, ChangeEvent } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Edit, Plus, Save, Upload, Link, Image, Video } from "lucide-react"
@@ -52,6 +53,21 @@ interface Product {
     type?: 'image' | 'video'
 }
 
+interface GoldScheme {
+    id: string
+    name: string
+    duration: string
+    monthlyAmount: string
+    totalAmount: string
+    goldValue: string
+    discount: string
+    features: string[]
+    color: string
+    popular: boolean
+    rules: string
+    image?: string
+}
+
 export default function AdminPage() {
     const { toast } = useToast()
     const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -61,18 +77,22 @@ export default function AdminPage() {
     const [rates, setRates] = useState<MetalRate>({ gold: 6250, silver: 78, lastUpdated: new Date().toISOString() })
     const [sliderItems, setSliderItems] = useState<SliderItem[]>([])
     const [products, setProducts] = useState<Product[]>([])
+    const [goldSchemes, setGoldSchemes] = useState<GoldScheme[]>([])
     
     // Filtering for Admin List View
     const [selectedCategory, setSelectedCategory] = useState("all")
     
     const [editingSlider, setEditingSlider] = useState<SliderItem | null>(null)
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+    const [editingGoldScheme, setEditingGoldScheme] = useState<GoldScheme | null>(null)
     const [deletingProductId, setDeletingProductId] = useState<string | null>(null)
     const [deletingSliderId, setDeletingSliderId] = useState<string | null>(null)
+    const [deletingGoldSchemeId, setDeletingGoldSchemeId] = useState<string | null>(null)
 
     // State for image handling mode
     const [useSliderImageLink, setUseSliderImageLink] = useState(false)
     const [useProductImageLink, setUseProductImageLink] = useState(false)
+    const [useGoldSchemeImageLink, setUseGoldSchemeImageLink] = useState(false)
 
     // State for media type
     const [sliderMediaType, setSliderMediaType] = useState<'image' | 'video'>('image')
@@ -81,6 +101,7 @@ export default function AdminPage() {
     // State for selected file objects
     const [selectedSliderFile, setSelectedSliderFile] = useState<File | null>(null)
     const [selectedProductFile, setSelectedProductFile] = useState<File | null>(null)
+    const [selectedGoldSchemeFile, setSelectedGoldSchemeFile] = useState<File | null>(null)
 
     useEffect(() => {
         const stored = localStorage.getItem("admin-auth")
@@ -113,6 +134,9 @@ export default function AdminPage() {
 
             const productsResponse = await fetch("/api/admin/products")
             if (productsResponse.ok) setProducts(await productsResponse.json())
+
+            const goldSchemesResponse = await fetch("/api/admin/gold-schemes")
+            if (goldSchemesResponse.ok) setGoldSchemes(await goldSchemesResponse.json())
         } catch (error) {
             console.error("Failed to load data:", error)
             toast({ title: "Error", description: "Failed to load initial data.", variant: "destructive" })
@@ -343,6 +367,91 @@ export default function AdminPage() {
         }
     }
 
+    // --- Gold Scheme Handlers ---
+    const startEditingGoldScheme = (scheme: GoldScheme | null) => {
+        setEditingGoldScheme(scheme)
+        setSelectedGoldSchemeFile(null)
+        setUseGoldSchemeImageLink(!!scheme?.image && !scheme.image.startsWith('/uploads/'))
+    }
+
+    const handleGoldSchemeImageFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedGoldSchemeFile(e.target.files[0])
+            if (editingGoldScheme) setEditingGoldScheme({ ...editingGoldScheme, image: "" })
+        } else {
+            setSelectedGoldSchemeFile(null)
+        }
+    }
+
+    const handleGoldSchemeImageLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (editingGoldScheme) {
+            setEditingGoldScheme({ ...editingGoldScheme, image: e.target.value })
+            setSelectedGoldSchemeFile(null)
+        }
+    }
+
+    const saveGoldScheme = async (scheme: GoldScheme) => {
+        const formData = new FormData()
+        const currentId = scheme.id || uuidv4()
+
+        formData.append("id", currentId)
+        formData.append("name", scheme.name)
+        formData.append("duration", scheme.duration)
+        formData.append("monthlyAmount", scheme.monthlyAmount)
+        formData.append("totalAmount", scheme.totalAmount)
+        formData.append("goldValue", scheme.goldValue)
+        formData.append("discount", scheme.discount)
+        formData.append("features", JSON.stringify(scheme.features))
+        formData.append("color", scheme.color)
+        formData.append("popular", scheme.popular.toString())
+        formData.append("rules", scheme.rules)
+
+        if (selectedGoldSchemeFile) {
+            formData.append("file", selectedGoldSchemeFile)
+        } else if (scheme.image) {
+            formData.append("imageLink", scheme.image)
+        }
+
+        try {
+            const method = scheme.id ? "PUT" : "POST"
+            const response = await fetch("/api/admin/gold-schemes", {
+                method,
+                body: formData,
+            })
+
+            if (response.ok) {
+                await loadData()
+                setEditingGoldScheme(null)
+                setSelectedGoldSchemeFile(null)
+                setUseGoldSchemeImageLink(false)
+                toast({ title: "Success", description: `Gold scheme ${scheme.id ? "updated" : "created"}` })
+            } else {
+                const errorData = await response.json()
+                throw new Error(errorData.error || `Failed to ${scheme.id ? "update" : "create"} gold scheme`)
+            }
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to save gold scheme", variant: "destructive" })
+        }
+    }
+
+    const deleteGoldScheme = async (id: string) => {
+        setDeletingGoldSchemeId(id)
+        try {
+            const response = await fetch(`/api/admin/gold-schemes?id=${id}`, { method: "DELETE" })
+            if (response.ok) {
+                await loadData()
+                toast({ title: "Success", description: "Gold scheme deleted successfully" })
+            } else {
+                const errorData = await response.json()
+                throw new Error(errorData.error || "Failed to delete gold scheme")
+            }
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to delete gold scheme", variant: "destructive" })
+        } finally {
+            setDeletingGoldSchemeId(null)
+        }
+    }
+
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat("en-GB", {
             dateStyle: "short",
@@ -386,10 +495,11 @@ export default function AdminPage() {
             <p className="text-muted-foreground">Manage your store</p>
 
             <Tabs defaultValue="rates" className="space-y-6">
-                <TabsList className="grid grid-cols-3 w-full">
+                <TabsList className="grid grid-cols-4 w-full">
                     <TabsTrigger value="rates">Metal Rates</TabsTrigger>
                     <TabsTrigger value="slider">Hero Slider</TabsTrigger>
                     <TabsTrigger value="products">Products</TabsTrigger>
+                    <TabsTrigger value="gold-schemes">Gold Schemes</TabsTrigger>
                 </TabsList>
 
                 {/* Metal Rates */}
@@ -779,6 +889,179 @@ export default function AdminPage() {
                                         setSelectedProductFile(null); 
                                         setUseProductImageLink(false); 
                                         setProductMediaType('image');
+                                    }}>Cancel</Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+                </TabsContent>
+
+                {/* Gold Schemes Section */}
+                <TabsContent value="gold-schemes">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">Gold Schemes</h2>
+                        <Button onClick={() => startEditingGoldScheme({
+                            id: "",
+                            name: "",
+                            duration: "",
+                            monthlyAmount: "",
+                            totalAmount: "",
+                            goldValue: "",
+                            discount: "",
+                            features: [],
+                            color: "from-yellow-400 to-yellow-600",
+                            popular: false,
+                            rules: "",
+                            image: "",
+                        })}>
+                            <Plus className="w-4 h-4 mr-2" /> Add Scheme
+                        </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {goldSchemes.map((scheme) => (
+                            <Card key={scheme.id}>
+                                <CardContent className="p-4">
+                                    {scheme.image && (
+                                        <div className="w-full h-40 mb-2 rounded overflow-hidden bg-gray-100">
+                                            <img
+                                                src={scheme.image}
+                                                alt={scheme.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className={`h-2 rounded-full bg-gradient-to-r ${scheme.color} mb-3`} />
+                                    <div className="flex items-start justify-between gap-2">
+                                        <h3 className="font-semibold">{scheme.name}</h3>
+                                        {scheme.popular && <Badge className="bg-orange-500">Popular</Badge>}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">{scheme.duration}</p>
+                                    <p className="text-sm">{scheme.monthlyAmount}</p>
+                                    <p className="text-sm text-green-700">{scheme.goldValue}</p>
+                                    <div className="flex gap-2 mt-3">
+                                        <Button variant="outline" size="sm" onClick={() => startEditingGoldScheme(scheme)}>
+                                            <Edit className="w-4 h-4" />
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={() => deleteGoldScheme(scheme.id)} disabled={deletingGoldSchemeId === scheme.id}>
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {editingGoldScheme && (
+                        <Card className="mt-6 border border-orange-500">
+                            <CardHeader><CardTitle>{editingGoldScheme.id ? "Edit" : "Add"} Gold Scheme</CardTitle></CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input placeholder="Scheme Name" value={editingGoldScheme.name} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, name: e.target.value })} />
+                                    <Input placeholder="Duration" value={editingGoldScheme.duration} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, duration: e.target.value })} />
+                                    <Input placeholder="Monthly Amount" value={editingGoldScheme.monthlyAmount} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, monthlyAmount: e.target.value })} />
+                                    <Input placeholder="Total Amount" value={editingGoldScheme.totalAmount} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, totalAmount: e.target.value })} />
+                                    <Input placeholder="Gold Return" value={editingGoldScheme.goldValue} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, goldValue: e.target.value })} />
+                                    <Input placeholder="Bonus / Benefit" value={editingGoldScheme.discount} onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, discount: e.target.value })} />
+                                    <select
+                                        value={editingGoldScheme.color}
+                                        onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, color: e.target.value })}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="from-yellow-400 to-yellow-600">Yellow</option>
+                                        <option value="from-yellow-500 to-orange-600">Yellow Orange</option>
+                                        <option value="from-green-400 to-yellow-400">Green Yellow</option>
+                                        <option value="from-orange-500 to-red-600">Orange Red</option>
+                                        <option value="from-amber-500 to-yellow-700">Amber Gold</option>
+                                    </select>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={editingGoldScheme.popular}
+                                            onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, popular: e.target.checked })}
+                                        />
+                                        <label>Mark as Most Popular</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Features (one per line)</label>
+                                    <Textarea
+                                        value={editingGoldScheme.features.join("\n")}
+                                        onChange={(e) => setEditingGoldScheme({
+                                            ...editingGoldScheme,
+                                            features: e.target.value.split("\n").map((item) => item.trim()).filter(Boolean),
+                                        })}
+                                        rows={5}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Rules / Terms</label>
+                                    <Textarea
+                                        value={editingGoldScheme.rules}
+                                        onChange={(e) => setEditingGoldScheme({ ...editingGoldScheme, rules: e.target.value })}
+                                        rows={8}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium">Pamphlet / Details Image</label>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant={useGoldSchemeImageLink ? "outline" : "default"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setUseGoldSchemeImageLink(false)
+                                                setSelectedGoldSchemeFile(null)
+                                                if (editingGoldScheme) setEditingGoldScheme({ ...editingGoldScheme, image: editingGoldScheme.image?.startsWith('/uploads/') ? editingGoldScheme.image : "" })
+                                            }}
+                                        >
+                                            <Upload className="w-4 h-4 mr-2" /> Upload File
+                                        </Button>
+                                        <Button
+                                            variant={useGoldSchemeImageLink ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setUseGoldSchemeImageLink(true)
+                                                setSelectedGoldSchemeFile(null)
+                                            }}
+                                        >
+                                            <Link className="w-4 h-4 mr-2" /> Use Link
+                                        </Button>
+                                    </div>
+
+                                    {useGoldSchemeImageLink ? (
+                                        <Input
+                                            placeholder="Image URL"
+                                            value={editingGoldScheme.image || ""}
+                                            onChange={handleGoldSchemeImageLinkChange}
+                                        />
+                                    ) : (
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleGoldSchemeImageFileChange}
+                                        />
+                                    )}
+
+                                    {(selectedGoldSchemeFile || editingGoldScheme.image) && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={selectedGoldSchemeFile ? URL.createObjectURL(selectedGoldSchemeFile) : editingGoldScheme.image}
+                                                alt="Scheme preview"
+                                                className="w-40 h-40 object-cover rounded border"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button onClick={() => saveGoldScheme(editingGoldScheme)}><Save className="w-4 h-4 mr-2" /> Save</Button>
+                                    <Button variant="outline" onClick={() => {
+                                        setEditingGoldScheme(null)
+                                        setSelectedGoldSchemeFile(null)
+                                        setUseGoldSchemeImageLink(false)
                                     }}>Cancel</Button>
                                 </div>
                             </CardContent>
